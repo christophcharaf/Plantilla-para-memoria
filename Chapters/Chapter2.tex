@@ -12,7 +12,9 @@ La implementación del autoencoder LSTM se apoyó en \texttt{TensorFlow} y su in
 
 Para el preprocesamiento se utilizó \texttt{scikit-learn} \citep{pedregosa2011scikit}. La normalización se realizó con \texttt{MinMaxScaler}, configurado con cotas fijas para desacoplar la transformación de la distribución particular de los datos de entrenamiento. La persistencia del preprocesador, necesaria para garantizar la misma transformación entre entrenamiento e inferencia, se gestionó con \texttt{joblib} \citep{joblib_site}, biblioteca de serialización binaria habitual en ese ecosistema.
 
-La manipulación de las series temporales se apoyó en \texttt{NumPy} \citep{harris2020numpy} y \texttt{pandas} \citep{mckinney2010pandas}, estándares en Python para arreglos n-dimensionales y tablas indexadas por tiempo. La obtención de métricas desde Prometheus se realizó vía HTTP con la biblioteca \texttt{requests} \citep{requests_site}, mientras que la instrumentación del servicio simulado utilizó el cliente oficial \texttt{prometheus\_client} \citep{prometheus_client_site}, que expone contadores e histogramas en el formato esperado por el recolector. La carga de archivos de configuración en formato YAML se delegó en \texttt{PyYAML} \citep{pyyaml_site}, y la generación de gráficos de evaluación \textit{offline} se realizó con \texttt{matplotlib} y \texttt{seaborn} \citep{matplotlib_site, seaborn_site}. La tabla~\ref{tab:bibliotecas} resume las bibliotecas principales y el rol que cumplen dentro del sistema.
+La manipulación de las series temporales se apoyó en \texttt{NumPy} \citep{harris2020numpy} y \texttt{pandas} \citep{mckinney2010pandas}, estándares en Python para arreglos n-dimensionales y tablas indexadas por tiempo. La obtención de métricas desde Prometheus se realizó vía HTTP con la biblioteca \texttt{requests} \citep{requests_site}, mientras que la instrumentación del servicio simulado utilizó el cliente oficial \texttt{prometheus\_client} \citep{prometheus_client_site}, que expone contadores e histogramas en el formato esperado por el recolector. La carga de archivos de configuración en formato YAML se delegó en \texttt{PyYAML} \citep{pyyaml_site}, y la generación de gráficos de evaluación \textit{offline} se realizó con \texttt{matplotlib} y \texttt{seaborn} \citep{matplotlib_site, seaborn_site}. 
+
+En entornos de observabilidad, la elección del stack analítico no es independiente del stack de despliegue: bibliotecas con dependencias pesadas o con requisitos de GPU dificultan la ejecución periódica en contenedores pequeños. Se priorizaron componentes maduros en CPU, serialización explícita de preprocesadores y modelos, y clientes HTTP livianos para consultar Prometheus sin introducir capas intermedias.La tabla~\ref{tab:bibliotecas} resume las bibliotecas principales y el rol que cumplen dentro del sistema.
 
 \begin{table}[h]
 \centering
@@ -41,9 +43,7 @@ La manipulación de las series temporales se apoyó en \texttt{NumPy} \citep{har
 \end{tabular}
 \end{table}
 
-En entornos de observabilidad, la elección del stack analítico no es independiente del stack de despliegue: bibliotecas con dependencias pesadas o con requisitos de GPU dificultan la ejecución periódica en contenedores pequeños. Se priorizaron componentes maduros en CPU, serialización explícita de preprocesadores y modelos, y clientes HTTP livianos para consultar Prometheus sin introducir capas intermedias.
-
-En la práctica, las dependencias se agruparon en tres bloques funcionales: cómputo numérico y aprendizaje profundo (\texttt{TensorFlow}, \texttt{NumPy}, \texttt{pandas}, \texttt{scikit-learn}), integración con observabilidad (\texttt{requests}, \texttt{prometheus\_client}, \texttt{PyYAML}) y evaluación visual (\texttt{matplotlib}, \texttt{seaborn}). Esta separación facilitó auditar qué componentes intervienen en el entrenamiento, en la inferencia y en los ensayos documentados en el capítulo de resultados.
+En la práctica, las dependencias se agruparon en tres bloques funcionales y modulares: cómputo numérico y aprendizaje profundo (\texttt{TensorFlow}, \texttt{NumPy}, \texttt{pandas}, \texttt{scikit-learn}), observabilidad (\texttt{requests}, \texttt{prometheus\_client}, \texttt{PyYAML}) y evaluación visual (\texttt{matplotlib}, \texttt{seaborn}). Esta separación facilitó auditar qué componentes intervienen en el entrenamiento, en la inferencia y en los ensayos documentados en el capítulo de resultados.
 
 \section{Datasets y datos de entrenamiento}
 \label{sec:datasets}
@@ -70,9 +70,9 @@ Cada observación temporal del conjunto consta de cinco métricas técnicas del 
 \item \texttt{cpu\_usage}: fracción de CPU consumida.
 \end{enumerate}
 
-Sobre estas métricas se derivaron seis variables temporales adicionales mediante codificación cíclica de la hora y del día de la semana, junto con indicadores de fin de semana y horario nocturno. La tabla~\ref{tab:dataset} sintetiza las características del conjunto antes y después de la transformación a ventanas deslizantes de 20 pasos (10~minutos). El procedimiento de obtención, alineación y normalización se documenta en el capítulo~\ref{Chapter3}.
+Sobre estas métricas se derivaron seis variables temporales adicionales mediante codificación cíclica de la hora y del día de la semana, junto con indicadores de fin de semana y horario nocturno. La tabla~\ref{tab:dataset} sintetiza las características del conjunto antes y después de la transformación a ventanas deslizantes de 20 pasos (10~minutos).
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Descripción del conjunto de datos utilizado para entrenamiento y evaluación.}
@@ -98,7 +98,7 @@ Etiquetas & Régimen no supervisado: entrenamiento sobre tramos nominales. \\
 
 La figura~\ref{fig:dataset-dist} muestra la distribución marginal de las cinco métricas técnicas sobre datos sintéticos ilustrativos con estacionalidad diaria compatible con el \textit{mock service}. Se incluye únicamente con fines demostrativos, dado que no corresponde publicar histogramas de la telemetría real.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.92\textwidth]{./Figures/dataset_distribution.png}
 \caption{Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}
@@ -125,22 +125,15 @@ El sistema fue concebido para ejecutarse en infraestructura propia, sin envío d
 
 El entorno de desarrollo se orquestó con Docker y Docker Compose \citep{merkel2014docker}, lo que permitió desplegar de forma reproducible los servicios involucrados desde un único archivo de declaración. Se distinguieron dos perfiles de uso: el perfil \texttt{dev}, con el stack completo de demostración (servicio simulado, Prometheus, Grafana y detector), y el despliegue productivo sobre la infraestructura AWS de la empresa cliente, donde únicamente se agregó el contenedor de detección a la red interna existente.
 
-El detector se distribuyó como una imagen basada en \filepath{python:3.10-slim}, con un usuario sin privilegios y montajes de los directorios de modelos, configuración y registros para preservar artefactos entre reinicios. La asignación de recursos definida en \filepath{docker-compose.yml} contempló un límite de una CPU virtual y 2~GB de memoria RAM para el contenedor de detección, lo que resultó suficiente para una inferencia cada 30~segundos sobre ventanas de 10~minutos. Los servicios auxiliares (servicio simulado, Prometheus y Grafana \citep{salituro2020grafana, grafana_site}) se aislaron en una red puente dedicada y se expusieron solo los puertos necesarios para inspección manual durante el desarrollo.
-
-La figura~\ref{fig:infra-demo} resume la topología del entorno demo. En producción, el servicio simulado no interviene: el detector consulta directamente la instancia Prometheus corporativa y emite alertas hacia Opsgenie.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.88\textwidth]{./Figures/infra_demo.png}
-\caption{Topología del entorno demo orquestado con Docker Compose (perfil \texttt{dev}).}
-\label{fig:infra-demo}
-\end{figure}
+El detector se distribuyó como una imagen basada en \path{python:3.10-slim}, con un usuario sin privilegios y montajes de los directorios de modelos, configuración y registros para preservar artefactos entre reinicios. La asignación de recursos definida en \path{docker-compose.yml} contempló un límite de una CPU virtual y 2~GB de memoria RAM para el contenedor de detección, lo que resultó suficiente para una inferencia cada 30~segundos sobre ventanas de 10~minutos. Los servicios auxiliares (servicio simulado, Prometheus y Grafana) se aislaron en una red puente dedicada y se expusieron solo los puertos necesarios para inspección manual durante el desarrollo.
 
 El entrenamiento se ejecutó en un equipo de desarrollo con procesador de uso general y sin GPU dedicada. El ciclo completo se completó en un tiempo del orden de minutos a decenas de minutos, según la cantidad de ventanas resultantes del período de 90~días. Esta capacidad de reentrenar en un horizonte corto fue un criterio explícito de diseño, dado que el régimen de operación del servicio puede evolucionar con cambios de versión del producto o con variaciones estacionales del tráfico.
 
+La integración con Opsgenie para la emisión de alertas y la generación de enlaces contextuales a Grafana se realizó mediante sus APIs públicas a través de HTTPS, sin agentes adicionales en el contenedor. De este modo, la infraestructura agregada por el sistema se redujo a un único servicio adicional dentro de la red interna, lo que respetó los requerimientos de seguridad y privacidad establecidos para el trabajo.
+
 La tabla~\ref{tab:infraestructura} resume el entorno técnico bajo el que se entrenó y desplegó el sistema.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Entorno de cómputo utilizado para entrenamiento y despliegue.}
@@ -149,9 +142,9 @@ La tabla~\ref{tab:infraestructura} resume el entorno técnico bajo el que se ent
 \toprule
 \textbf{Componente} & \textbf{Descripción} \\
 \midrule
-Lenguaje y entorno base & Python 3.10 sobre imagen \filepath{python:3.10-slim}. \\
+Lenguaje y entorno base & Python 3.10 sobre imagen \path{python:3.10-slim}. \\
 Orquestación de servicios & Docker Compose con perfil \texttt{dev} para entorno completo de pruebas. \\
-Recursos del contenedor de detección & 1.0 CPU virtual y 2~GB de memoria RAM (límite en \filepath{docker-compose.yml}). \\
+Recursos del contenedor de detección & 1.0 CPU virtual y 2~GB de memoria RAM (límite en \path{docker-compose.yml}). \\
 Aceleración por GPU & No utilizada. Todo el cómputo se realizó en CPU. \\
 Servicios auxiliares & Prometheus, Grafana y servicio simulado para pruebas. \\
 Red & Red puente \texttt{monitoring} en Docker, sin exposición pública. \\
@@ -160,4 +153,4 @@ Destino de despliegue productivo & Infraestructura propia de la empresa cliente 
 \end{tabular}
 \end{table}
 
-La integración con Opsgenie \citep{opsgenie_site} para la emisión de alertas y la generación de enlaces contextuales a Grafana se realizó mediante sus APIs públicas a través de HTTPS, sin agentes adicionales en el contenedor. De este modo, la infraestructura agregada por el sistema se redujo a un único servicio adicional dentro de la red interna, lo que respetó los requerimientos de seguridad y privacidad establecidos para el trabajo.
+
