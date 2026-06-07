@@ -1,184 +1,163 @@
-\chapter{Introducción específica} % Main chapter title
+% Chapter 2
 
+\chapter{Introducción específica}
 \label{Chapter2}
 
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
+En el presente capítulo se describen los recursos de software, los conjuntos de datos y la infraestructura de cómputo de terceros que sustentan el sistema documentado en esta memoria. Se justifica la elección de cada componente y se caracteriza el origen de la telemetría utilizada para el entrenamiento.
 
-\section{Estilo y convenciones}
-\label{sec:ejemplo}
+\section{Frameworks y bibliotecas de IA/ML}
+\label{sec:frameworks-bibliotecas}
 
-\subsection{Uso de mayúscula inicial para los título de secciones}
+La implementación del autoencoder LSTM se apoyó en \texttt{TensorFlow} y su interfaz \texttt{Keras} \citep{abadi2016tensorflow, chollet2015keras}, que ofrecen una capa de alto nivel para definir, entrenar y serializar redes neuronales profundas. Entre las capas utilizadas figuran \texttt{LSTM}, \texttt{RepeatVector} y \texttt{TimeDistributed}, componentes nativos que permiten expresar la arquitectura codificador--decodificador con pocas líneas. La elección del \textit{framework} obedeció a la integración estable con el ecosistema Python usado para procesamiento de datos, a la portabilidad del modelo entrenado a contenedores en CPU y al formato de serialización \texttt{.weights.h5}, que se acompaña de un archivo JSON con la definición estructural del grafo para reconstruir el modelo en inferencia sin acoplarse a una versión particular del entorno de entrenamiento.
 
-Si en el texto se hace alusión a diferentes partes del trabajo referirse a ellas como capítulo, sección o subsección según corresponda. Por ejemplo: ``En el capítulo \ref{Chapter1} se explica tal cosa'', o ``En la sección \ref{sec:ejemplo} se presenta lo que sea'', o ``En la subsección \ref{subsec:ejemplo} se discute otra cosa''.
+Para el preprocesamiento se utilizó \texttt{scikit-learn} \citep{pedregosa2011scikit}. La normalización se realizó con \texttt{MinMaxScaler}, configurado con cotas fijas para desacoplar la transformación de la distribución particular de los datos de entrenamiento. La persistencia del preprocesador, necesaria para garantizar la misma transformación entre entrenamiento e inferencia, se gestionó con \texttt{joblib} \citep{joblib_site}, biblioteca de serialización binaria habitual en ese ecosistema.
 
-Cuando se quiere poner una lista tabulada, se hace así:
+La manipulación de las series temporales se apoyó en \texttt{NumPy} \citep{harris2020numpy} y \texttt{pandas} \citep{mckinney2010pandas}, estándares en Python para arreglos n-dimensionales y tablas indexadas por tiempo. La obtención de métricas desde Prometheus se realizó vía HTTP con la biblioteca \texttt{requests} \citep{requests_site}, mientras que la instrumentación del servicio simulado utilizó el cliente oficial \texttt{prometheus\_client} \citep{prometheus_client_site}, que expone contadores e histogramas en el formato esperado por el recolector. La carga de archivos de configuración en formato YAML se delegó en \texttt{PyYAML} \citep{pyyaml_site}, y la generación de gráficos de evaluación \textit{offline} se realizó con \texttt{matplotlib} y \texttt{seaborn} \citep{matplotlib_site, seaborn_site}. La tabla~\ref{tab:bibliotecas} resume las bibliotecas principales y el rol que cumplen dentro del sistema.
 
-\begin{itemize}
-	\item Este es el primer elemento de la lista.
-	\item Este es el segundo elemento de la lista.
-\end{itemize}
+\begin{table}[h]
+\centering
+\small
+\caption{Bibliotecas de terceros utilizadas en el sistema y su rol.}
+\label{tab:bibliotecas}
+\begin{tabular}{@{}p{0.26\textwidth}cp{0.46\textwidth}@{}}
+\toprule
+\textbf{Biblioteca} & \textbf{Versión} & \textbf{Rol en el sistema} \\
+\midrule
+\texttt{TensorFlow} / \texttt{Keras} & 2.8 & Definición y entrenamiento del autoencoder LSTM. \\
+\addlinespace
+\texttt{scikit-learn} & 1.0 & Normalización (\texttt{MinMaxScaler}) con cotas fijas. \\
+\texttt{joblib} & 1.1 & Persistencia del preprocesador entrenado. \\
+\addlinespace
+\texttt{NumPy} & 1.19 & Operaciones con arreglos n-dimensionales y cálculo del error de reconstrucción. \\
+\texttt{pandas} & 1.3 & Manipulación de series temporales y construcción de ventanas. \\
+\addlinespace
+\texttt{requests} & 2.26 & Consultas HTTP a la API de Prometheus. \\
+\texttt{prometheus\_\allowbreak client} & 0.17 & Exposición de métricas en el servicio simulado. \\
+\addlinespace
+\texttt{PyYAML} & 5.4 & Carga de archivos de configuración. \\
+\addlinespace
+\texttt{matplotlib} / \texttt{seaborn} & 3.4 / 0.11 & Gráficos de evaluación offline del modelo. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Notar el uso de las mayúsculas y el punto al final de cada elemento.
+En entornos de observabilidad, la elección del stack analítico no es independiente del stack de despliegue: bibliotecas con dependencias pesadas o con requisitos de GPU dificultan la ejecución periódica en contenedores pequeños. Se priorizaron componentes maduros en CPU, serialización explícita de preprocesadores y modelos, y clientes HTTP livianos para consultar Prometheus sin introducir capas intermedias.
 
-Si se desea poner una lista numerada el formato es este:
+En la práctica, las dependencias se agruparon en tres bloques funcionales: cómputo numérico y aprendizaje profundo (\texttt{TensorFlow}, \texttt{NumPy}, \texttt{pandas}, \texttt{scikit-learn}), integración con observabilidad (\texttt{requests}, \texttt{prometheus\_client}, \texttt{PyYAML}) y evaluación visual (\texttt{matplotlib}, \texttt{seaborn}). Esta separación facilitó auditar qué componentes intervienen en el entrenamiento, en la inferencia y en los ensayos documentados en el capítulo de resultados.
+
+\section{Datasets y datos de entrenamiento}
+\label{sec:datasets}
+
+El conjunto de datos utilizado para entrenar y evaluar el sistema corresponde a telemetría operativa del servicio de TV-over-IP de la empresa cliente, recolectada con un intervalo de muestreo de 30~segundos sobre una ventana histórica de 90~días. La fuente primaria es la instancia interna de Prometheus de la organización \citep{brazil2018prometheus, prometheus_site}. Las series se obtuvieron mediante la API HTTP de rango \texttt{api/v1/query\_range}, con las consultas PromQL definidas en el archivo \texttt{config/data.yaml} del repositorio.
+
+\subsection{Confidencialidad y entorno de demostración}
+
+El entrenamiento sobre telemetría real se realizó dentro de la infraestructura autorizada de la empresa. No obstante, las métricas de desempeño operativo (carga, latencia, errores y consumo de recursos) constituyen información confidencial: su publicación en un repositorio académico o en capturas de la memoria permitiría inferir aspectos del comportamiento productivo del servicio.
+
+Por ese motivo, el material reproducible del trabajo, incluido el repositorio entregable y las figuras ilustrativas de este capítulo, emplea un entorno demostrativo con un servicio simulado y un generador sintético que replica la misma familia de métricas y la semántica de agregación PromQL del entorno productivo.
+
+Esta separación no implica que el modelo se haya entrenado únicamente con datos sintéticos: el régimen nominal utilizado para el aprendizaje provino de Prometheus interno. El simulador permitió desarrollar y validar el \textit{pipeline} de forma reproducible, ejecutar demostraciones sin acceso a la red de producción y documentar el sistema sin exponer series identificables para los fines académicos de este trabajo.
+
+\subsection{Características del conjunto de datos}
+
+Cada observación temporal del conjunto consta de cinco métricas técnicas del servicio, seleccionadas para cubrir carga, experiencia del usuario y salud del proceso:
 
 \begin{enumerate}
-	\item Este es el primer elemento de la lista.
-	\item Este es el segundo elemento de la lista.
+\item \texttt{request\_rate}: tasa de peticiones HTTP por segundo.
+\item \texttt{latency\_p95}: percentil 95 de la latencia de respuesta.
+\item \texttt{memory\_usage}: memoria residente del proceso.
+\item \texttt{error\_rate}: tasa de respuestas erróneas por segundo.
+\item \texttt{cpu\_usage}: fracción de CPU consumida.
 \end{enumerate}
 
-Notar el uso de las mayúsculas y el punto al final de cada elemento.
+Sobre estas métricas se derivaron seis variables temporales adicionales mediante codificación cíclica de la hora y del día de la semana, junto con indicadores de fin de semana y horario nocturno. La tabla~\ref{tab:dataset} sintetiza las características del conjunto antes y después de la transformación a ventanas deslizantes de 20 pasos (10~minutos). El procedimiento de obtención, alineación y normalización se documenta en el capítulo~\ref{Chapter3}.
 
-\subsection{Este es el título de una subsección}
-\label{subsec:ejemplo}
-
-Se recomienda no utilizar \textbf{texto en negritas} en ningún párrafo, ni tampoco texto \underline{subrayado}. En cambio sí se debe utilizar \textit{texto en itálicas} para palabras en un idioma extranjero, al menos la primera vez que aparecen en el texto. En el caso de palabras que estamos inventando se deben utilizar ``comillas'', así como también para citas textuales. Por ejemplo, un \textit{digital filter} es una especie de ``selector'' que permite separar ciertos componentes armónicos en particular.
-
-La escritura debe ser impersonal. Por ejemplo, no utilizar ``el diseño del firmware lo hice de acuerdo con tal principio'', sino ``el firmware fue diseñado utilizando tal principio''. 
-
-El trabajo es algo que al momento de escribir la memoria se supone que ya está concluido, entonces todo lo que se refiera a hacer el trabajo se narra en tiempo pasado, porque es algo que ya ocurrió. Por ejemplo, "se diseñó el firmware empleando la técnica de test driven development".
-
-En cambio, la memoria es algo que está vivo cada vez que el lector la lee. Por eso transcurre siempre en tiempo presente, como por ejemplo:
-
-``En el presente capítulo se da una visión global sobre las distintas pruebas realizadas y los resultados obtenidos. Se explica el modo en que fueron llevados a cabo los test unitarios y las pruebas del sistema''.
-
-Se recomienda no utilizar una sección de glosario sino colocar la descripción de las abreviaturas como parte del mismo cuerpo del texto. Por ejemplo, RTOS (\textit{Real Time Operating System}, Sistema Operativo de Tiempo Real) o en caso de considerarlo apropiado mediante notas a pie de página.
-
-Si se desea indicar alguna página web utilizar el siguiente formato de referencias bibliográficas, dónde las referencias se detallan en la sección de bibliografía de la memoria, utilizado el formato establecido por IEEE en \citep{IEEE:citation}. Por ejemplo, ``el presente trabajo se basa en la plataforma EDU-CIAA-NXP \citep{CIAA}, la cual...''.
-
-\subsection{Figuras} 
-
-Al insertar figuras en la memoria se deben considerar determinadas pautas. Para empezar, usar siempre tipografía claramente legible. Luego, tener claro que \textbf{es incorrecto} escribir por ejemplo esto: ``El diseño elegido es un cuadrado, como se ve en la siguiente figura:''
-
-\begin{figure}[h]
+\begin{table}[H]
 \centering
-\includegraphics[scale=.45]{./Figures/cuadradoAzul.png}
-\end{figure}
-
-La forma correcta de utilizar una figura es con referencias cruzadas, por ejemplo: ``Se eligió utilizar un cuadrado azul para el logo, como puede observarse en la figura \ref{fig:cuadradoAzul}''.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=.45]{./Figures/cuadradoAzul.png}
-	\caption{Ilustración del cuadrado azul que se eligió para el diseño del logo.}
-	\label{fig:cuadradoAzul}
-\end{figure}
-
-El texto de las figuras debe estar siempre en español, excepto que se decida reproducir una figura original tomada de alguna referencia. En ese caso la referencia de la cual se tomó la figura debe ser indicada en el epígrafe de la figura e incluida como una nota al pie, como se ilustra en la figura \ref{fig:palabraIngles}.
-
-\begin{figure}[htpb]
-	\centering
-	\includegraphics[scale=.3]{./Figures/word.jpeg}
-	\caption{Imagen tomada de la página oficial del procesador\protect\footnotemark.}
-	\label{fig:palabraIngles}
-\end{figure}
-
-\footnotetext{Imagen tomada de \url{https://goo.gl/images/i7C70w}}
-
-La figura y el epígrafe deben conformar una unidad cuyo significado principal pueda ser comprendido por el lector sin necesidad de leer el cuerpo central de la memoria. Para eso es necesario que el epígrafe sea todo lo detallado que corresponda y si en la figura se utilizan abreviaturas entonces aclarar su significado en el epígrafe o en la misma figura.
-
-
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=.37]{./Figures/questionMark.png}
-	\caption{¿Por qué de pronto aparece esta figura?}
-	\label{fig:questionMark}
-\end{figure}
-
-Nunca colocar una figura en el documento antes de hacer la primera referencia a ella, como se ilustra con la figura \ref{fig:questionMark}, porque sino el lector no comprenderá por qué de pronto aparece la figura en el documento, lo que distraerá su atención.
-
-Otra posibilidad es utilizar el entorno \textit{subfigure} para incluir más de una figura, como se puede ver en la figura \ref{fig:three graphs}. Notar que se pueden referenciar también las figuras internas individualmente de esta manera: \ref{fig:1de3}, \ref{fig:2de3} y \ref{fig:3de3}.
- 
-\begin{figure}[!htpb]
-     \centering
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Un caption.}
-         \label{fig:1de3}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Otro.}
-         \label{fig:2de3}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Y otro más.}
-         \label{fig:3de3}
-     \end{subfigure}
-        \caption{Tres gráficos simples.}
-        \label{fig:three graphs}
-\end{figure}
-
-El código para generar las imágenes se encuentra disponible para su reutilización en el archivo \file{Chapter2.tex}.
-
-\subsection{Tablas}
-
-Para las tablas utilizar el mismo formato que para las figuras, sólo que el epígrafe se debe colocar arriba de la tabla, como se ilustra en la tabla \ref{tab:peces}. Observar que sólo algunas filas van con líneas visibles y notar el uso de las negritas para los encabezados.  La referencia se logra utilizando el comando \verb|\ref{<label>}| donde label debe estar definida dentro del entorno de la tabla.
-
-\begin{verbatim}
-\begin{table}[h]
-	\centering
-	\caption[caption corto]{caption largo más descriptivo}
-	\begin{tabular}{l c c}    
-		\toprule
-		\textbf{Especie}     & \textbf{Tamaño} & \textbf{Valor}\\
-		\midrule
-		Amphiprion Ocellaris & 10 cm           & \$ 6.000 \\		
-		Hepatus Blue Tang    & 15 cm           & \$ 7.000 \\
-		Zebrasoma Xanthurus  & 12 cm           & \$ 6.800 \\
-		\bottomrule
-		\hline
-	\end{tabular}
-	\label{tab:peces}
-\end{table}
-\end{verbatim}
-
-
-\begin{table}[h]
-	\centering
-	\caption[caption corto]{caption largo más descriptivo.}
-	\begin{tabular}{l c c}    
-		\toprule
-		\textbf{Especie} 	 & \textbf{Tamaño} 		& \textbf{Valor}  \\
-		\midrule
-		Amphiprion Ocellaris & 10 cm 				& \$ 6.000 \\		
-		Hepatus Blue Tang	 & 15 cm				& \$ 7.000 \\
-		Zebrasoma Xanthurus	 & 12 cm				& \$ 6.800 \\
-		\bottomrule
-		\hline
-	\end{tabular}
-	\label{tab:peces}
+\small
+\caption{Descripción del conjunto de datos utilizado para entrenamiento y evaluación.}
+\label{tab:dataset}
+\begin{tabular}{@{}p{0.34\textwidth}p{0.58\textwidth}@{}}
+\toprule
+\textbf{Atributo} & \textbf{Valor o descripción} \\
+\midrule
+Origen de datos & Prometheus (instancia interna) con simulador y generador sintético de núcleo compartido para desarrollo. \\
+Confidencialidad & Telemetría productiva no publicada; figuras ilustrativas con datos sintéticos. \\
+Período cubierto & 90~días corridos previos al entrenamiento. \\
+Intervalo de muestreo & 30~segundos. \\
+Cantidad aproximada de muestras & 259\,200 puntos por métrica. \\
+Métricas técnicas & \texttt{request\_rate}, \texttt{latency\_p95}, \texttt{memory\_usage}, \texttt{error\_rate} y \texttt{cpu\_usage}. \\
+Variables temporales derivadas & \texttt{hour\_sin}, \texttt{hour\_cos}, \texttt{dayofweek\_sin}, \texttt{dayofweek\_cos}, \texttt{is\_weekend} e \texttt{is\_night}. \\
+Dimensión de cada ventana & 20 pasos $\times$ 11 variables. \\
+Longitud temporal de la ventana & 10~minutos. \\
+Particionado entrenamiento / validación & 80~\% / 20~\% en orden temporal (último tramo como validación). \\
+Etiquetas & Régimen no supervisado: entrenamiento sobre tramos nominales. \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-En cada capítulo se debe reiniciar el número de conteo de las figuras y las tablas, por ejemplo, figura 2.1 o tabla 2.1, pero no se debe reiniciar el conteo en cada sección. Por suerte la plantilla se encarga de esto por nosotros.
+La figura~\ref{fig:dataset-dist} muestra la distribución marginal de las cinco métricas técnicas sobre datos sintéticos ilustrativos con estacionalidad diaria compatible con el \textit{mock service}. Se incluye únicamente con fines demostrativos, dado que no corresponde publicar histogramas de la telemetría real.
 
-\subsection{Ecuaciones}
-\label{sec:Ecuaciones}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{./Figures/dataset_distribution.png}
+\caption{Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}
+\label{fig:dataset-dist}
+\end{figure}
 
-Al insertar ecuaciones en la memoria dentro de un entorno \textit{equation}, éstas se numeran en forma automática  y se pueden referir al igual que como se hace con las figuras y tablas, por ejemplo ver la ecuación \ref{eq:metric}.
+Cabe aclarar que el problema se planteó como detección no supervisada: el conjunto de entrenamiento se compuso de tramos en los que el servicio operó dentro de su régimen nominal y no se dispuso de un etiquetado fiable de anomalías históricas a la escala del dataset completo.
 
-\begin{equation}
-	\label{eq:metric}
-	ds^2 = c^2 dt^2 \left( \frac{d\sigma^2}{1-k\sigma^2} + \sigma^2\left[ d\theta^2 + \sin^2\theta d\phi^2 \right] \right)
-\end{equation}
-                                                        
-Para generar la ecuación \ref{eq:metric} se utilizó el siguiente código:
+Al tratarse de telemetría propia de un servicio en producción, no se utilizaron \textit{datasets} públicos como fuente principal. El dominio (calidad de servicio en \textit{streaming} sobre infraestructura específica) no encuentra equivalencia directa en repositorios abiertos como Numenta NAB \citep{numenta_nab} o Yahoo Webscope \citep{yahoo_webscope}, que agrupan series heterogéneas con distinto muestreo y sin el stack Prometheus del cliente.
 
-\begin{verbatim}
-\begin{equation}
-	\label{eq:metric}
-	ds^2 = c^2 dt^2 \left( \frac{d\sigma^2}{1-k\sigma^2} + 
-	\sigma^2\left[ d\theta^2 + 
-	\sin^2\theta d\phi^2 \right] \right)
-\end{equation}
-\end{verbatim}
+\section{Modelos preentrenados y transferencia de aprendizaje}
+\label{sec:transfer-learning}
+
+El sistema no incorporó modelos preentrenados ni esquemas de \textit{transfer learning}. La razón es triple. En primer lugar, no existen modelos públicamente disponibles entrenados sobre telemetría operativa de servicios de TV-over-IP con la misma combinación de métricas y régimen de muestreo de 30~segundos. La transferencia desde dominios distintos (texto, visión o series financieras) no resultaba directamente aplicable porque las entradas, la escala temporal y la semántica de las variables difieren sustancialmente.
+
+En segundo lugar, \textit{benchmarks} genéricos como Numenta NAB entrenan o evalúan sobre series univariadas o multivariadas heterogéneas que no coinciden con el vector de once variables construido en este trabajo (cinco métricas de servicio y seis atributos temporales). Un modelo preentrenado en esos conjuntos no habría capturado las correlaciones entre latencia, tasa de errores y patrones circadianos del servicio concreto.
+
+En tercer lugar, el volumen disponible de datos del régimen nominal resultó adecuado para un entrenamiento desde cero en tiempos razonables sobre hardware modesto, sin necesidad de inicializaciones de gran capacidad. Ante la ausencia de un punto de partida compatible y la suficiencia de datos propios, se entrenó el autoencoder LSTM exclusivamente sobre telemetría del entorno autorizado.
+
+\section{Infraestructura de cómputo}
+\label{sec:infraestructura}
+
+El sistema fue concebido para ejecutarse en infraestructura propia, sin envío de telemetría a servicios externos. Tanto el entrenamiento como la inferencia se realizaron en CPU. El tamaño reducido del modelo y de la ventana de inferencia hicieron innecesario el uso de aceleradores gráficos.
+
+El entorno de desarrollo se orquestó con Docker y Docker Compose \citep{merkel2014docker}, lo que permitió desplegar de forma reproducible los servicios involucrados desde un único archivo de declaración. Se distinguieron dos perfiles de uso: el perfil \texttt{dev}, con el stack completo de demostración (servicio simulado, Prometheus, Grafana y detector), y el despliegue productivo sobre la infraestructura AWS de la empresa cliente, donde únicamente se agregó el contenedor de detección a la red interna existente.
+
+El detector se distribuyó como una imagen basada en \filepath{python:3.10-slim}, con un usuario sin privilegios y montajes de los directorios de modelos, configuración y registros para preservar artefactos entre reinicios. La asignación de recursos definida en \filepath{docker-compose.yml} contempló un límite de una CPU virtual y 2~GB de memoria RAM para el contenedor de detección, lo que resultó suficiente para una inferencia cada 30~segundos sobre ventanas de 10~minutos. Los servicios auxiliares (servicio simulado, Prometheus y Grafana \citep{salituro2020grafana, grafana_site}) se aislaron en una red puente dedicada y se expusieron solo los puertos necesarios para inspección manual durante el desarrollo.
+
+La figura~\ref{fig:infra-demo} resume la topología del entorno demo. En producción, el servicio simulado no interviene: el detector consulta directamente la instancia Prometheus corporativa y emite alertas hacia Opsgenie.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{./Figures/infra_demo.png}
+\caption{Topología del entorno demo orquestado con Docker Compose (perfil \texttt{dev}).}
+\label{fig:infra-demo}
+\end{figure}
+
+El entrenamiento se ejecutó en un equipo de desarrollo con procesador de uso general y sin GPU dedicada. El ciclo completo se completó en un tiempo del orden de minutos a decenas de minutos, según la cantidad de ventanas resultantes del período de 90~días. Esta capacidad de reentrenar en un horizonte corto fue un criterio explícito de diseño, dado que el régimen de operación del servicio puede evolucionar con cambios de versión del producto o con variaciones estacionales del tráfico.
+
+La tabla~\ref{tab:infraestructura} resume el entorno técnico bajo el que se entrenó y desplegó el sistema.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Entorno de cómputo utilizado para entrenamiento y despliegue.}
+\label{tab:infraestructura}
+\begin{tabular}{@{}p{0.28\textwidth}p{0.64\textwidth}@{}}
+\toprule
+\textbf{Componente} & \textbf{Descripción} \\
+\midrule
+Lenguaje y entorno base & Python 3.10 sobre imagen \filepath{python:3.10-slim}. \\
+Orquestación de servicios & Docker Compose con perfil \texttt{dev} para entorno completo de pruebas. \\
+Recursos del contenedor de detección & 1.0 CPU virtual y 2~GB de memoria RAM (límite en \filepath{docker-compose.yml}). \\
+Aceleración por GPU & No utilizada. Todo el cómputo se realizó en CPU. \\
+Servicios auxiliares & Prometheus, Grafana y servicio simulado para pruebas. \\
+Red & Red puente \texttt{monitoring} en Docker, sin exposición pública. \\
+Destino de despliegue productivo & Infraestructura propia de la empresa cliente sobre AWS, sin dependencia de servicios analíticos de terceros. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La integración con Opsgenie \citep{opsgenie_site} para la emisión de alertas y la generación de enlaces contextuales a Grafana se realizó mediante sus APIs públicas a través de HTTPS, sin agentes adicionales en el contenedor. De este modo, la infraestructura agregada por el sistema se redujo a un único servicio adicional dentro de la red interna, lo que respetó los requerimientos de seguridad y privacidad establecidos para el trabajo.

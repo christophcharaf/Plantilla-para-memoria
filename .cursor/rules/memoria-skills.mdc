@@ -1,0 +1,18 @@
+---
+description: Cuándo usar las skills del proyecto (LaTeX, fuentes de contenido, correcciones XFDF)
+alwaysApply: true
+---
+
+# Skills de esta memoria (FIUBA)
+
+Antes de responder sobre estos temas, **lee el `SKILL.md` indicado** y sigue su flujo (no improvises).
+
+| Situación | Abrir y seguir |
+|-----------|------------------|
+| `.tex`, `memorianueva.tex`, `portada.tex`, `Chapters/`, `references.bib`, compilar PDF, `latexmk`, LaTeX Workshop, tablas `booktabs`, biblatex, figuras, errores de compilación o vista previa | `.cursor/skills/latex-memoria-preview/SKILL.md` |
+| Redactar o completar capítulos, alinear con planificación/cátedra, menciones a planificación, plantilla-memoria, memoria de referencia `TI_Cid`, o fuentes en `References/` | `.cursor/skills/memoria-fuentes-contenido/SKILL.md` + regla **memoria-redaccion** (flujo 2 fases) |
+| Correcciones del revisor, PDF anotado, XFDF, `Correcciones/`, `*_correcciones.md`, incorporar feedback del PDF | `.cursor/skills/aplicar-correcciones-xfdf/SKILL.md` |
+
+Si varias filas aplican a la misma tarea, lee las skills en ese orden cuando el contenido lo exija: primero fuentes de contenido al escribir; LaTeX al editar/compilar; XFDF solo cuando haya correcciones exportadas.
+
+**Redacción de capítulos:** regla **memoria-redaccion.mdc** (always apply) + Fase 1 contenido → Fase 2 itálicas/citas (skill **memoria-fuentes-contenido**, §6).

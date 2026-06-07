@@ -1,0 +1,10 @@
+\babel@toc {spanish}{}\relax 
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Ejemplo conceptual de una métrica de servicio con un tramo de comportamiento anómalo.}}{2}{figure.caption.7}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}}{10}{figure.caption.12}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Topología del entorno demo orquestado con Docker Compose (perfil \texttt {dev}).}}{12}{figure.caption.13}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Flujo del sistema de detección: desde Prometheus hasta alertas en Opsgenie y enlace contextual a Grafana.}}{13}{figure.caption.15}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }

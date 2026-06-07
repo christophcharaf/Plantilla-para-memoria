@@ -1,0 +1,24 @@
+\babel@toc {spanish}{}\relax 
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces Comparación sintética de enfoques para detección de anomalías en métricas operativas (orientación conceptual).}}{4}{table.caption.8}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Trabajos de referencia y línea adoptada en esta memoria (orientación conceptual).}}{4}{table.caption.9}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Bibliotecas de terceros utilizadas en el sistema y su rol.}}{8}{table.caption.10}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Descripción del conjunto de datos utilizado para entrenamiento y evaluación.}}{10}{table.caption.11}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Entorno de cómputo utilizado para entrenamiento y despliegue.}}{12}{table.caption.14}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Consultas PromQL y agregación por métrica del servicio.}}{15}{table.caption.16}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Cotas de normalización \texttt {fixed\_minmax} por variable.}}{16}{table.caption.17}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Etapas del pipeline de datos y artefactos producidos.}}{17}{table.caption.18}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Módulos implementados y responsabilidad funcional.}}{18}{table.caption.19}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Paridad y diferencias deliberadas entre entrenamiento e inferencia.}}{19}{table.caption.20}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Capas del autoencoder LSTM y formas intermedias ($B$ = tamaño de lote).}}{20}{table.caption.21}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces Asignación de prioridad Opsgenie según confianza de la anomalía.}}{20}{table.caption.22}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Complejidad del modelo y costo operativo estimado.}}{21}{table.caption.23}%
+\contentsline {table}{\numberline {3.9}{\ignorespaces Hiperparámetros de entrenamiento del autoencoder LSTM.}}{22}{table.caption.24}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Artefactos del modelo y del pipeline utilizados en inferencia.}}{23}{table.caption.25}%
+\contentsline {table}{\numberline {3.11}{\ignorespaces Exploración de configuraciones alternativas (\texttt {tune\_model.py}).}}{24}{table.caption.26}%
+\contentsline {table}{\numberline {3.12}{\ignorespaces Archivos de configuración YAML del sistema.}}{26}{table.caption.27}%
+\contentsline {table}{\numberline {3.13}{\ignorespaces Comparación entre entorno demo y despliegue productivo.}}{27}{table.caption.28}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }

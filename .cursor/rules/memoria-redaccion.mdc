@@ -1,0 +1,69 @@
+---
+description: Flujo de redacción en dos fases, itálicas, citas y estilo cátedra para capítulos de la memoria
+globs: Chapters/**/*.tex
+alwaysApply: true
+---
+
+# Redacción de la memoria — reglas de flujo y estilo
+
+## Flujo obligatorio al escribir o ampliar un capítulo
+
+**No mezclar redacción y pulido tipográfico en la misma pasada.**
+
+### Fase 1 — Redactar (contenido primero)
+
+- Completar secciones, tablas, figuras y argumentos.
+- Pasado impersonal (“se implementó”, “se utilizó”); párrafo introductorio del capítulo en presente (“En el presente capítulo se…”).
+- `\texttt{}` para bibliotecas, archivos, rutas y nombres de métricas.
+- `\citep{clave}` al **presentar** una fuente externa nueva (paper, manual, biblioteca de terceros).
+- Coherencia con `References/Plantilla_planificacion_final.md`, capítulos anteriores y confidencialidad (skill **memoria-fuentes-contenido**, §5).
+- Compilar solo para maquetación (márgenes, floats); **no** pulir itálicas término a término mientras se escribe.
+
+### Fase 2 — Revisar (después de redactar)
+
+Pasada **sistemática** sobre el `.tex` del capítulo, **cruzando con todos los capítulos anteriores** (Cap. 1, 2, … en orden de la memoria).
+
+**Itálicas** (`References/Errores comunes.md`):
+
+- Extranjerismo no castellanizado: `\textit{}` **solo la primera aparición en toda la memoria**; después en redonda.
+- Código/archivos: `\texttt{}`, no itálica.
+- Negrita **solo** en títulos de sección (plantilla) y encabezados de tabla (`\textbf{}`); no en párrafos ni celdas de datos.
+- **Consistencia global:** mismo nombre siempre igual (MLflow, Prometheus, *machine learning* 1ª vez / redonda después).
+- **Números:** ≤4 cifras sin separador (`1000`); ≥5 con espacio (`10\,000`); decimales con coma (`0{,}91`).
+- **Mayúsculas:** no Title Case en epígrafes (*Ensayos realizados*, no *Ensayos Realizados*); minúscula tras dos puntos.
+- Figuras/tablas/`texttt`: sin desbordar márgenes; floats cerca de la sección que los cita; sin huecos en blanco grandes; extensión mínima por capítulo (`plantilla-memoria.md`).
+
+**Ecuaciones** (`Errores comunes.md`, §12):
+
+- Display que se cite en el texto: `equation` + `\label{eq:...}` + `ecuación~\eqref{eq:...}`.
+- Solo numerar las referenciadas; auxiliares sin cita: `\[...\]` o `equation*`.
+
+**Citas**:
+
+- Citar al presentar la fuente; **no** repetir `\citep{}` en cada mención operativa del mismo recurso.
+- Herramienta ya citada en capítulo anterior: no hace falta re-citar salvo reintroducción formal.
+
+**Gerundio y relativos** (`Errores comunes.md`, §7–§8):
+
+- Gerundio solo con simultaneidad o anterioridad; evitar *`, utilizando`*, *`, permitiendo`*, *`, siendo`* y gerundios formulaicos tras coma.
+- Evitar exceso de *lo cual*, *el cual*, *la cual*, *los cuales*, *las cuales*; preferir *que* o reescribir en dos oraciones.
+
+**Checklist rápido**: `período` con tilde; `este`/`ese`/`aquel` sin tilde; `solo` sin tilde; sin futuro de planificación; gerundio y *lo cual* / *el cual* revisados; consistencia de nombres y cifras; ecuaciones display con `\label{eq:...}` si se citan; figuras/tablas en margen; compilar `memorianueva.tex` (revisar overfull hbox).
+
+**Revisión global** (diapositiva cátedra, prevalente): `References/Errores comunes.md` → sección *Revisión global de toda la memoria*.
+
+## Detalle ampliado
+
+- Skill **memoria-fuentes-contenido** → §6 (flujo completo + checklist).
+- Skill **latex-memoria-preview** → convenciones LaTeX y compilación.
+- Skill **aplicar-correcciones-xfdf** → cuando haya feedback del revisor.
+
+## Términos ya en itálica en capítulos 1–3 (usar redonda al repetir)
+
+Cap. 1: `backend`, `machine learning`, `autoencoders`, `isolation forest`, `streaming`, `stack`, `recall`, `kNN`, `RNN`.
+
+Cap. 2: `framework`, `offline`, `gauges`, `pipeline`, `demo`, `forward-fill`, `datasets`, `mock service`, `transfer learning`, `benchmarks`.
+
+Cap. 3: `stride`, `dropout`, `bottleneck`, `batch`, `callbacks`, `dashboard`, `payload`, `compose`.
+
+Actualizar esta lista al cerrar cada capítulo nuevo.
