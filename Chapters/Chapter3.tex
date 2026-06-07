@@ -4,29 +4,20 @@
 
 En el presente capítulo se describe el diseño e implementación del sistema de detección de anomalías: el pipeline de datos desde Prometheus hasta las ventanas multivariadas, la arquitectura del autoencoder LSTM, el procedimiento de entrenamiento y calibración del umbral, y la integración del servicio de inferencia con Opsgenie y Grafana.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{./Figures/flow_diag.png}
-\caption{Flujo del sistema de detección: desde Prometheus hasta alertas en Opsgenie y enlace contextual a Grafana.}
-\label{fig:flujo-sistema}
-\end{figure}
-
-La figura~\ref{fig:flujo-sistema} resume el flujo operativo completo, desde la recolección de telemetría hasta la emisión de alertas contextualizadas.
-
 \section{Pipeline de datos}
 \label{sec:pipeline-datos}
 
 El pipeline de datos automatiza las etapas que transforman telemetría cruda en secuencias listas para el modelo. 
 
-Se implementó como un conjunto de módulos Python invocados desde el script de entrenamiento (\filepath{scripts/train.py}) y reutilizados en inferencia (\filepath{scripts/inference.py}), de modo que entrenamiento y producción comparten exactamente las mismas reglas de transformación.
+Se implementó como un conjunto de módulos Python invocados desde el script de entrenamiento (\path{scripts/train.py}) y reutilizados en inferencia (\path{scripts/inference.py}), de modo que entrenamiento y producción comparten exactamente las mismas reglas de transformación.
 
-La configuración operativa, incluidas las consultas PromQL, las cotas de normalización, el tamaño de ventana y los parámetros de alerta, se externalizó en archivos YAML bajo \filepath{config/}, lo que permitió ajustar el comportamiento sin modificar el código fuente.
+La configuración operativa, incluidas las consultas PromQL, las cotas de normalización, el tamaño de ventana y los parámetros de alerta, se externalizó en archivos YAML bajo \path{config/}, lo que permitió ajustar el comportamiento sin modificar el código fuente.
 
 \subsection{Recolección y alineación temporal}
 
-La primera etapa obtiene series desde la API HTTP de rango de Prometheus (\filepath{api/v1/query\_range}).
+La primera etapa obtiene series desde la API HTTP de rango de Prometheus (\path{api/v1/query\_range}).
 
-Un cliente dedicado (\texttt{PrometheusClient}) lee las consultas definidas en \filepath{config/data.yaml} y ejecuta cada consulta con paso de muestreo de 30~segundos.
+Un cliente dedicado (\texttt{PrometheusClient}) lee las consultas definidas en \path{config/data.yaml} y ejecuta cada consulta con paso de muestreo de 30~segundos.
 
 Tras obtener las series por instancia, se agregaron los resultados según la semántica de cada métrica:
 
@@ -40,13 +31,13 @@ Las series devueltas se integraron en un marco temporal común, con \texttt{time
 
 Cuando faltaban puntos aislados dentro del intervalo de muestreo, se aplicó forward-fill acotado antes de descartar ventanas incompletas. El cliente incorporó además un ajuste automático del paso de consulta cuando el rango solicitado superaba el límite de 11\,000 puntos por petición impuesto por Prometheus y preservó la cobertura temporal sin truncar silenciosamente el historial.
 
-Para el entrenamiento sobre el entorno autorizado de la empresa, el cliente apuntó a la instancia Prometheus interna. En el repositorio reproducible y en el perfil \texttt{dev} de Docker Compose, las mismas consultas se ejecutaron contra un servicio simulado instrumentado con \filepath{prometheus\_client}, compartiendo núcleo de generación con el generador sintético offline (\filepath{traffic\_simulation\_core.py}).
+Para el entrenamiento sobre el entorno autorizado de la empresa, el cliente apuntó a la instancia Prometheus interna. En el repositorio reproducible y en el perfil \texttt{dev} de Docker Compose, las mismas consultas se ejecutaron contra un servicio simulado instrumentado con \path{prometheus\_client}, compartiendo núcleo de generación con el generador sintético offline (\path{traffic\_simulation\_core.py}).
 
 Así se garantizó paridad semántica entre fuentes sin exponer telemetría confidencial en el material académico reproducible.
 
 La tabla~\ref{tab:promql-queries} detalla las consultas PromQL configuradas, la agregación aplicada tras obtener las series por instancia y la interpretación operativa de cada señal. Mantener las consultas declarativas permitió auditar qué aspecto del servicio alimenta cada variable del modelo y replicar el mismo criterio en el simulador.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \footnotesize
 \caption{Consultas PromQL y agregación por métrica del servicio.}
@@ -68,7 +59,7 @@ El intervalo de cinco minutos en las funciones \texttt{rate} y \texttt{histogram
 
 Cuando el historial solicitado superaba el límite de puntos por consulta, el cliente recalculó el paso efectivo manteniendo fijo el rango temporal total. De este modo, un entrenamiento sobre 90~días no truncó silenciosamente las primeras semanas del período, situación que se detectó en pruebas iniciales y que habría sesgado la estimación de estacionalidad semanal. La resolución efectiva resultante fue más gruesa solo cuando fue estrictamente necesaria para cumplir la restricción de la API.
 
-Se eligió un horizonte de 90~días porque cubre varios ciclos semanales completos y proporciona del orden de 259\,200 muestras por métrica, volumen suficiente para estimar un régimen nominal estable sin exigir almacenamiento excesivo. El particionado reservó el 20~\% final de las ventanas para validación y preservó el orden cronológico a fin de evitar filtraciones de información futura. Las cinco métricas técnicas y las variables temporales derivadas se caracterizaron en la sección~\ref{sec:datasets}.
+Se eligió un horizonte de 90~días porque cubre varios ciclos semanales completos y proporciona del orden de 259\,200 muestras por métrica, volumen suficiente para estimar un régimen nominal estable sin exigir almacenamiento excesivo. El particionado reservó el 20~\% final de las ventanas para validación y preservó el orden cronológico a fin de evitar filtraciones de información futura.
 
 \subsection{Ingeniería de variables y normalización}
 
@@ -83,13 +74,15 @@ Tras la alineación, el módulo \texttt{DataPreprocessor} enriqueció cada insta
 
 La codificación cíclica evita discontinuidades artificiales en los límites del calendario (por ejemplo, entre las 23:00 y las 00:00) y permite al modelo distinguir patrones diarios y semanales sin depender de umbrales fijos por horario.
 
-La normalización se realizó con \texttt{MinMaxScaler} en modo \texttt{fixed\_minmax}: en lugar de ajustar mínimos y máximos sobre el conjunto de entrenamiento, se fijaron cotas determinísticas por variable en \filepath{config/data.yaml}, derivadas del análisis del servicio simulado y validadas contra consultas reales. La tabla~\ref{tab:fixed-bounds} resume los rangos adoptados.
+La normalización se realizó con \texttt{MinMaxScaler} en modo \texttt{fixed\_minmax}: en lugar de ajustar mínimos y máximos sobre el conjunto de entrenamiento, se fijaron cotas determinísticas por variable en \path{config/data.yaml}, derivadas del análisis del servicio simulado y validadas contra consultas reales. La tabla~\ref{tab:fixed-bounds} resume los rangos adoptados.
 
 En las primeras iteraciones se probó \texttt{StandardScaler}, que memoriza media y desviación estándar del lote de entrenamiento. Cuando el modelo entrenado con datos sintéticos se evaluó sobre Prometheus productivo, las series normalizadas quedaron desplazadas respecto del dominio aprendido y el error de reconstrucción superó el umbral de forma sistemática en tramos nominales.
 
 El modo \texttt{fixed\_minmax} eliminó ese acoplamiento: la misma observación cruda produce siempre la misma coordenada normalizada, con independencia del origen o del período de entrenamiento. Este criterio resultó central para desplegar un único par modelo--preprocesador en producción sin recalibrar el escalador ante cada reentrenamiento.
 
-\begin{table}[H]
+Las cotas de la tabla~\ref{tab:fixed-bounds} se derivaron del análisis del servicio simulado que se basó en el servicio real como referencia directa:
+
+\begin{table}[h]
 \centering
 \footnotesize
 \caption{Cotas de normalización \texttt{fixed\_minmax} por variable.}
@@ -109,26 +102,36 @@ Indicadores binarios & 0 & 1 \\
 \end{tabular}
 \end{table}
 
-El preprocesador serializado (\filepath{models/preprocessor.joblib}) persiste el escalador, la lista de columnas activas y la configuración de variables temporales, de modo que inferencia y entrenamiento aplican la misma transformación bit a bit.
+La tasa de peticiones sigue un factor diario sinusoidal con ruido gaussiano, la latencia percentil 95 se modela como proporcional a ese factor más un piso constante, y las tasas de error y CPU escalan con la demanda esperada. Los límites superiores incorporaron margen por encima del máximo observado en condiciones nominales para absorber picos breves sin saturar la escala. Si una observación excediera una cota, \texttt{MinMaxScaler} la acotó al intervalo $[0,1]$, señal explícita de régimen extremo que el autoencoder aprendió a reconstruir con mayor error.
 
-Las cotas de la tabla~\ref{tab:fixed-bounds} se derivaron del análisis del servicio simulado: la tasa de peticiones sigue un factor diario sinusoidal con ruido gaussiano, la latencia percentil 95 se modela como proporcional a ese factor más un piso constante, y las tasas de error y CPU escalan con la demanda esperada. Los límites superiores incorporaron margen por encima del máximo observado en condiciones nominales para absorber picos breves sin saturar la escala. Si una observación excediera una cota, \texttt{MinMaxScaler} la acotó al intervalo $[0,1]$, señal explícita de régimen extremo que el autoencoder aprendió a reconstruir con mayor error.
+
+El preprocesador serializado (\path{models/preprocessor.joblib}) persiste el escalador, la lista de columnas activas y la configuración de variables temporales, de modo que inferencia y entrenamiento aplican la misma transformación bit a bit.
 
 \subsection{Construcción de ventanas deslizantes}
 
 La etapa final del pipeline convirtió la serie multivariada preprocesada en tensores tridimensionales $(N, T, F)$, donde $N$ es la cantidad de ventanas, $T = 20$ el número de pasos temporales y $F = 11$ el número de variables por paso. La clase \texttt{WindowGenerator} implementó dos modos:
 
 \begin{itemize}
-\item Entrenamiento (\texttt{create\_sequences}): ventanas deslizantes con \textit{stride}~$= 1$, con solapamiento máximo entre muestras consecutivas. Con 90~días de muestreo cada 30~segundos, ello generó del orden de $250\,000$ ventanas, frente a unas $12\,000$ obtenidas con stride~$= 20$ en prototipos iniciales.
+\item Entrenamiento (\texttt{create\_sequences}): ventanas deslizantes con \textit{stride}~$= 1$, con solapamiento máximo entre muestras consecutivas. Con 90~días de muestreo cada 30~segundos, se produjeron alrededor de $250\,000$ ventanas, frente a unas $12\,000$ obtenidas con stride~$= 20$ en prototipos iniciales.
 \item Inferencia (\texttt{create\_single\_window}): extracción de los últimos $T$ puntos disponibles. Si la cantidad era insuficiente, el servicio omitía el ciclo de detección en lugar de rellenar con ceros, para evitar falsos positivos por ventanas artificialmente completadas.
 \end{itemize}
 
 Cada ventana abarcó 10~minutos de operación ($20 \times 30\,\mathrm{s}$), horizonte elegido por equilibrar sensibilidad a degradaciones sostenidas y costo de cómputo en CPU. El particionado entre entrenamiento y validación reservó el 20~\% final de las ventanas y preservó el orden cronológico.
 
-La longitud de 20 pasos implicó que una anomalía puntual de un solo muestreo quedara diluida en la reconstrucción global de la ventana, mientras que desvíos sostenidos durante varios minutos, el caso operativo de interés, modificaron de forma coherente múltiples pasos y varias variables a la vez y elevaron el error agregado por encima del umbral. Ventanas más cortas (10 pasos) reaccionaron antes pero fueron más sensibles al ruido. Ventanas de 30 pasos (15~minutos) suavizaron en exceso incidentes breves. El valor 20 resultó del benchmark interno documentado en \filepath{tune\_model.py}.
+La longitud de 20 pasos implicó que una anomalía puntual de un solo muestreo quedara diluida en la reconstrucción global de la ventana, mientras que desvíos sostenidos durante varios minutos, el caso operativo de interés, modificaron de forma coherente múltiples pasos y varias variables a la vez y elevaron el error agregado por encima del umbral. Ventanas más cortas (10 pasos) reaccionaron antes pero fueron más sensibles al ruido. Ventanas de 30 pasos (15~minutos) suavizaron en exceso incidentes breves. El valor 20 resultó del benchmark interno documentado en \path{tune\_model.py}.
 
-La tabla~\ref{tab:pipeline-etapas} detalla entradas, salidas y artefactos de cada etapa.
+La tabla~\ref{tab:pipeline-etapas} detalla entradas, salidas y artefactos de cada etapa, la figura \ref{fig:sliding_window} demuestra gráficamente la ventana deslizante.
 
-\begin{table}[H]
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.92\textwidth]{./Figures/sliding_window.png}
+\caption{Estructura lógica de ventanas deslizantes.}
+\label{fig:sliding_window}
+\end{figure}
+
+\begin{table}[h]
 \centering
 \small
 \caption{Etapas del pipeline de datos y artefactos producidos.}
@@ -137,21 +140,21 @@ La tabla~\ref{tab:pipeline-etapas} detalla entradas, salidas y artefactos de cad
 \toprule
 \textbf{Etapa} & \textbf{Entrada / salida} & \textbf{Implementación} \\
 \midrule
-Recolección & Consultas PromQL $\rightarrow$ series por métrica & \texttt{PrometheusClient}, \filepath{config/data.yaml} \\
+Recolección & Consultas PromQL $\rightarrow$ series por métrica & \texttt{PrometheusClient}, \path{config/data.yaml} \\
 Alineación & Series $\rightarrow$ marco temporal unificado & \texttt{pandas}, forward-fill acotado \\
-Ingeniería & Marco + reloj $\rightarrow$ 11 variables & \filepath{DataPreprocessor.\_add\_temporal\_features} \\
+Ingeniería & Marco + reloj $\rightarrow$ 11 variables & \texttt{add\_temporal\_features} de \texttt{preprocessor} \\
 Normalización & Valores crudos $\rightarrow$ $[0,1]$ fijo & \texttt{MinMaxScaler} con cotas en YAML \\
 Ventanas & Serie $\rightarrow$ $(N, 20, 11)$ & \texttt{WindowGenerator} \\
-Persistencia & Escalador y metadatos & \filepath{preprocessor.joblib} \\
+Persistencia & Escalador y metadatos & \path{preprocessor.joblib} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Organización del código fuente}
 
-El repositorio entregable agrupó la lógica en cuatro paquetes bajo \filepath{src/}, más scripts ejecutables en \filepath{scripts/} y configuración en \filepath{config/}. La tabla~\ref{tab:modulos} resume la responsabilidad de cada módulo principal. Esta separación permitió probar el preprocesamiento y la generación de ventanas de forma aislada antes de integrarlos con el servicio de inferencia.
+El repositorio entregable agrupó la lógica en cuatro paquetes bajo \path{src/}, más scripts ejecutables en \path{scripts/} y configuración en \path{config/}. La tabla~\ref{tab:modulos} resume la responsabilidad de cada módulo principal. Esta separación permitió probar el preprocesamiento y la generación de ventanas de forma aislada antes de integrarlos con el servicio de inferencia.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \footnotesize
 \caption{Módulos implementados y responsabilidad funcional.}
@@ -160,17 +163,17 @@ El repositorio entregable agrupó la lógica en cuatro paquetes bajo \filepath{s
 \toprule
 \textbf{Módulo / script} & \textbf{Responsabilidad} \\
 \midrule
-\filepath{src/data/prometheus\_client.py} & Consultas HTTP, agregación y alineación de series \\
-\filepath{src/data/preprocessor.py} & Variables temporales y normalización \\
-\filepath{src/data/windowing.py} & Ventanas deslizantes para entrenamiento e inferencia \\
-\filepath{src/data/synthetic\_data.py} & Generación offline de series de respaldo \\
-\filepath{src/models/lstm\_autoencoder.py} & Definición, entrenamiento y persistencia del modelo \\
-\filepath{src/alerting/detector.py} & Puntuación de anomalía por ventana \\
-\filepath{src/alerting/opsgenie\_client.py} & Emisión de alertas y notificaciones de resolución \\
-\filepath{src/alerting/grafana\_links.py} & Construcción de URLs contextuales al panel de Grafana \\
-\filepath{scripts/train.py} & Orquestación del entrenamiento extremo a extremo \\
-\filepath{scripts/inference.py} & Bucle de detección en tiempo de operación \\
-\filepath{scripts/tune\_model.py} & Exploración de arquitecturas sin afectar artefactos productivos \\
+\path{src/data/prometheus\_client.py} & Consultas HTTP, agregación y alineación de series \\
+\path{src/data/preprocessor.py} & Variables temporales y normalización \\
+\path{src/data/windowing.py} & Ventanas deslizantes para entrenamiento e inferencia \\
+\path{src/data/synthetic\_data.py} & Generación offline de series de respaldo \\
+\path{src/models/lstm\_autoencoder.py} & Definición, entrenamiento y persistencia del modelo \\
+\path{src/alerting/detector.py} & Puntuación de anomalía por ventana \\
+\path{src/alerting/opsgenie\_client.py} & Emisión de alertas y notificaciones de resolución \\
+\path{src/alerting/grafana\_links.py} & Construcción de URLs contextuales al panel de Grafana \\
+\path{scripts/train.py} & Orquestación del entrenamiento extremo a extremo \\
+\path{scripts/inference.py} & Bucle de detección en tiempo de operación \\
+\path{scripts/tune\_model.py} & Exploración de arquitecturas sin afectar artefactos productivos \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -183,11 +186,11 @@ Cualquier divergencia en el orden de transformaciones, en las columnas activas o
 
 Para cerrar esa brecha se adoptaron tres medidas concretas.
 
-Primero, el mismo objeto \texttt{DataPreprocessor} serializado se cargó en inferencia sin reajuste sobre datos recientes. Segundo, las consultas PromQL y las reglas de agregación se leyeron del mismo archivo \filepath{config/data.yaml} en ambos modos. Tercero, la generación de ventanas en inferencia utilizó exclusivamente los últimos $T$ puntos completos, mientras que en entrenamiento se generó el conjunto completo con stride~$=1$, pero aplicando la misma función de extracción por ventana.
+Primero, el mismo objeto \texttt{DataPreprocessor} serializado se cargó en inferencia sin reajuste sobre datos recientes. Segundo, las consultas PromQL y las reglas de agregación se leyeron del mismo archivo \path{config/data.yaml} en ambos modos. Tercero, la generación de ventanas en inferencia utilizó exclusivamente los últimos $T$ puntos completos, mientras que en entrenamiento se generó el conjunto completo con stride~$=1$, pero aplicando la misma función de extracción por ventana.
 
 La tabla~\ref{tab:train-inferencia-paridad} contrasta el comportamiento en cada fase. Las diferencias restantes son intencionales: el solapamiento masivo solo tiene sentido offline para aumentar muestras de entrenamiento, mientras que en línea basta la ventana corriente.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Paridad y diferencias deliberadas entre entrenamiento e inferencia.}
@@ -197,7 +200,7 @@ La tabla~\ref{tab:train-inferencia-paridad} contrasta el comportamiento en cada 
 \textbf{Aspecto} & \textbf{Entrenamiento} & \textbf{Inferencia} \\
 \midrule
 Fuente de datos & 90~días históricos & Últimos 10~minutos \\
-Consultas PromQL & \filepath{config/data.yaml} & Mismo archivo \\
+Consultas PromQL & \path{config/data.yaml} & Mismo archivo \\
 Preprocesador & \texttt{fit\_transform} + persistencia & \texttt{load} + \texttt{transform} \\
 Generación de ventanas & \texttt{create\_\allowbreak sequences}, stride~$=1$ & \texttt{create\_\allowbreak single\_window} \\
 Ventana incompleta & Descartada al particionar & Omite ciclo (sin relleno) \\
@@ -209,11 +212,18 @@ Salida del modelo & Pérdida MSE + umbral & Error $e$ vs.\ $\tau$ + alerta \\
 \section{Arquitectura del modelo}
 \label{sec:arquitectura-modelo}
 
-El núcleo analítico es un autoencoder LSTM secuencia a secuencia: aprende a comprimir una ventana nominal en una representación latente y a reconstruirla paso a paso. En inferencia, un error de reconstrucción elevado indica que la ventana observada no coincide con los patrones aprendidos durante el entrenamiento sobre tramos nominales. La figura~\ref{fig:flujo-sistema} sitúa este componente dentro del flujo global del sistema, desde la recolección en Prometheus hasta la emisión de alertas.
+A continuación, en la figura \ref{fig:infra_demo.png} se ilustra la arquitectura del sistema desarrollado, desde el servicio simulado en Flask hasta la visualización y alertas por Grafana y Opsgenie respectivamente 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.92\textwidth]{./Figures/infra_demo.png}
+\caption{Estructura lógica de ventanas deslizantes.}
+\label{fig:infra_demo.png}
+\end{figure}
 
 \subsection{Codificador y decodificador}
 
-La arquitectura implementada en \texttt{LSTMAutoencoder} (\filepath{src/models/lstm\_autoencoder.py}) siguió el esquema codificador--bottleneck--decodificador de Malhotra et al. \citep{malhotra2015long}, adaptado al vector de once variables y a la ventana de 20 pasos.
+La arquitectura implementada en \texttt{LSTMAutoencoder} (\path{src/models/lstm\_autoencoder.py}) siguió el esquema codificador--bottleneck--decodificador de Malhotra et al., adaptado al vector de once variables y a la ventana de 20 pasos.
 
 El codificador apiló tres capas \texttt{LSTM} con 64, 32 y 16 unidades respectivamente. Las dos primeras devolvieron secuencias completas (\texttt{return\_sequences=True}), y la tercera produjo el vector latente de dimensión 16. Entre capas recurrentes se insertó \textit{dropout} del 10~\% para regularizar.
 
@@ -221,7 +231,7 @@ El decodificador expandió el latente mediante \texttt{RepeatVector}, replicánd
 
 La tabla~\ref{tab:capas-modelo} resume la pila de capas, formas tensoriales intermedias y justificación de diseño.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Capas del autoencoder LSTM y formas intermedias ($B$ = tamaño de lote).}
@@ -248,7 +258,7 @@ El entrenamiento minimizó el error cuadrático medio (MSE) \citep{chollet2015ke
 e = \frac{1}{T \cdot F} \sum_{t=1}^{T} \sum_{f=1}^{F} \bigl(x_{t,f} - \hat{x}_{t,f}\bigr)^2
 \label{eq:mse-reconstruccion}
 \end{equation}
-donde $x$ es la ventana observada y $\hat{x}$ la reconstrucción del modelo. Una ventana se marcó como anómala cuando $e$ superó un umbral $\tau$ calibrado sobre errores de validación (sección~\ref{sec:entrenamiento}).
+donde $x$ es la ventana observada y $\hat{x}$ la reconstrucción del modelo. Una ventana se marcó como anómala cuando $e$ superó un umbral $\tau$ calibrado sobre errores de validación.
 
 Además del criterio binario, se definió una magnitud de confianza relativa para priorizar alertas, según la ecuación~\eqref{eq:confianza-anomalia}:
 \begin{equation}
@@ -257,7 +267,7 @@ c = \frac{e - \tau}{\tau} \quad \text{cuando } e > \tau
 \end{equation}
 y $c = 0$ en caso contrario. Valores de $c$ más altos indicaron un apartamiento más marcado del régimen nominal aprendido.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Asignación de prioridad Opsgenie según confianza de la anomalía.}
@@ -282,7 +292,7 @@ A diferencia de reglas univariadas por métrica, el autoencoder procesa las once
 
 El vector latente de dimensión 16 actúa como \textit{bottleneck}: obliga al modelo a capturar regularidades compactas del régimen nominal (ciclos diarios, diferencia fin de semana vs.\ día hábil, correlación entre carga y latencia) y descartar variaciones de alta frecuencia no repetibles. Durante el entrenamiento, la pérdida de validación descendió de forma monótona hasta estabilizarse en valores del orden de $10^{-3}$ en la escala normalizada, señal de que el bottleneck conservó información suficiente para reconstruir ventanas nominales sin memorizar ruido puntual. La tabla~\ref{tab:complejidad-modelo} resume la complejidad paramétrica y el costo operativo.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Complejidad del modelo y costo operativo estimado.}
@@ -302,11 +312,11 @@ Frecuencia del bucle & 1 evaluación cada 30~s \\
 
 \subsection{Decisiones de diseño arquitectónico}
 
-Se eligió una topología simétrica 64--32--16--32--64 por ser suficientemente expresiva para once variables en CPU y mantener tiempos de inferencia acotados (inferior a un segundo por ciclo en el contenedor de despliegue). Configuraciones con bottleneck más estrecho (8 unidades) y más ancho (32 unidades) se evaluaron en el script \filepath{tune\_model.py}. La topología base ofreció el mejor equilibrio entre pérdida de validación y estabilidad frente a datos de Prometheus.
+Se eligió una topología simétrica 64--32--16--32--64 por ser suficientemente expresiva para once variables en CPU y mantener tiempos de inferencia acotados (inferior a un segundo por ciclo en el contenedor de despliegue). Configuraciones con bottleneck más estrecho (8 unidades) y más ancho (32 unidades) se evaluaron en el script \path{tune\_model.py}. La topología base ofreció el mejor equilibrio entre pérdida de validación y estabilidad frente a datos de Prometheus.
 
 La activación lineal en la capa de salida preservó la interpretabilidad de las variables reconstruidas en la escala normalizada. No se emplearon capas convolucionales ni mecanismos de atención: el muestreo fijo cada 30~segundos y la ventana corta de 10~minutos hicieron innecesaria una mayor complejidad para capturar la estacionalidad diaria modelada explícitamente mediante variables temporales.
 
-Los pesos entrenados y la configuración estructural se serializaron por separado (\filepath{lstm\_autoencoder.weights.h5} y \filepath{lstm\_autoencoder\_config.json}) para reconstruir el grafo computacional en inferencia sin acoplarse a una versión concreta del entorno de entrenamiento.
+Los pesos entrenados y la configuración estructural se serializaron por separado (\path{lstm\_autoencoder.weights.h5} y \path{lstm\_autoencoder\_config.json}) para reconstruir el grafo computacional en inferencia sin acoplarse a una versión concreta del entorno de entrenamiento.
 
 \section{Entrenamiento y optimización}
 \label{sec:entrenamiento}
@@ -315,9 +325,9 @@ Esta sección documenta el procedimiento de entrenamiento del autoencoder, la ca
 
 \subsection{Procedimiento de entrenamiento}
 
-El script \filepath{scripts/train.py} orquestó el flujo completo: carga de configuración, obtención de datos, preprocesamiento, generación de ventanas, entrenamiento, persistencia de artefactos y cálculo del umbral. Los hiperparámetros principales se fijaron en \filepath{config/model.yaml} y se resumen en la tabla~\ref{tab:hiperparametros}.
+El script \path{scripts/train.py} orquestó el flujo completo: carga de configuración, obtención de datos, preprocesamiento, generación de ventanas, entrenamiento, persistencia de artefactos y cálculo del umbral. Los hiperparámetros principales se fijaron en \path{config/model.yaml} y se resumen en la tabla~\ref{tab:hiperparametros}.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Hiperparámetros de entrenamiento del autoencoder LSTM.}
@@ -356,10 +366,12 @@ El procedimiento de entrenamiento puede resumirse en ocho pasos ejecutados de fo
 \item Construcción de ventanas con stride~$=1$.
 \item Partición temporal 80/20.
 \item Ajuste del autoencoder con \textit{callbacks} de parada temprana y reducción de tasa de aprendizaje.
-\item Cálculo del umbral sobre errores de validación y guardado de artefactos en \filepath{models/}.
+\item Cálculo del umbral sobre errores de validación y guardado de artefactos en \path{models/}.
 \end{enumerate}
 
-\begin{table}[H]
+Cualquier interrupción antes del paso 8 deja el directorio en estado inconsistente. Por ello el despliegue productivo exige verificar la presencia de los cuatro artefactos listados en la tabla~\ref{tab:artefactos}.
+
+\begin{table}[h]
 \centering
 \small
 \caption{Artefactos del modelo y del pipeline utilizados en inferencia.}
@@ -368,33 +380,31 @@ El procedimiento de entrenamiento puede resumirse en ocho pasos ejecutados de fo
 \toprule
 \textbf{Artefacto} & \textbf{Contenido} \\
 \midrule
-\filepath{lstm\_autoencoder.weights.h5} & Pesos entrenados del autoencoder \\
-\filepath{lstm\_autoencoder\_config.json} & Arquitectura y metadatos de reconstrucción del grafo \\
-\filepath{preprocessor.joblib} & Escalador \texttt{fixed\_minmax} y columnas activas \\
-\filepath{anomaly\_threshold.npy} & Umbral $\tau$ calibrado en validación \\
+\path{lstm\_autoencoder.weights.h5} & Pesos entrenados del autoencoder \\
+\path{lstm\_autoencoder\_config.json} & Arquitectura y metadatos de reconstrucción del grafo \\
+\path{preprocessor.joblib} & Escalador \texttt{fixed\_minmax} y columnas activas \\
+\path{anomaly\_threshold.npy} & Umbral $\tau$ calibrado en validación \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Cualquier interrupción antes del paso 8 deja el directorio en estado inconsistente. Por ello el despliegue productivo exige verificar la presencia de los cuatro artefactos listados en la tabla~\ref{tab:artefactos}.
-
 \subsection{Calibración del umbral}
 
-Tras el entrenamiento, se calcularon los errores $e$ de la ecuación~\eqref{eq:mse-reconstruccion} sobre el conjunto de validación temporal y se definió el umbral $\tau$ como un percentil de esa distribución, configurable en \filepath{config/alerting.yaml}. El percentil inicial se fijó en un valor alto (99,5) para limitar falsos positivos sobre tramos nominales. El valor definitivo se ajustó iterativamente con el equipo de operaciones durante las pruebas de validación y priorizó una tasa de alertas compatible con la capacidad de respuesta del servicio de guardia.
+Tras el entrenamiento, se calcularon los errores $e$ de la ecuación~\eqref{eq:mse-reconstruccion} sobre el conjunto de validación temporal y se definió el umbral $\tau$ como un percentil de esa distribución, configurable en \path{config/alerting.yaml}. El percentil inicial se fijó en un valor alto (99,5) para limitar falsos positivos sobre tramos nominales. El valor definitivo se ajustó iterativamente con el equipo de operaciones durante las pruebas de validación y priorizó una tasa de alertas compatible con la capacidad de respuesta del servicio de guardia.
 
 Como alternativa implementada pero no adoptada en producción, el mismo módulo soportó un umbral por media más dos desviaciones estándar de los errores de validación. La variante por percentil resultó más interpretable para los operadores porque expresa directamente qué fracción del comportamiento nominal se tolera antes de escalar.
 
-El umbral serializado (\filepath{models/anomaly\_threshold.npy}) se cargó en inferencia junto con el modelo y el preprocesador. Así se mantuvo coherencia entre el criterio de entrenamiento y el despliegue.
+El umbral serializado (\path{models/anomaly\_threshold.npy}) se cargó en inferencia junto con el modelo y el preprocesador. Así se mantuvo coherencia entre el criterio de entrenamiento y el despliegue.
 
 \subsection{Exploración de hiperparámetros}
 
-Se realizó una búsqueda acotada de configuraciones alternativas mediante \filepath{scripts/tune\_model.py}, que entrenó candidatos en un directorio aislado (\filepath{evaluation/tuning\_runs/}) sin sobrescribir los artefactos productivos.
+Se realizó una búsqueda acotada de configuraciones alternativas mediante \path{scripts/tune\_model.py}, que entrenó candidatos en un directorio aislado (\path{evaluation/tuning\_runs/}) sin sobrescribir los artefactos productivos.
 
 Los escenarios evaluados incluyeron bottleneck reducido ([32, 16, 8]), bottleneck ampliado ([128, 64, 32]), dropout 0,2 y ventanas de 30 pasos (15~minutos).
 
 Los criterios de selección combinaron la pérdida de validación, el margen entre error medio en datos nominales y el umbral propuesto, y la tasa de falsos positivos sobre ventanas sintéticas con anomalías inyectadas. La configuración base (ventana 20, capas 64--32--16, dropout 0,1, stride 1, \texttt{fixed\_minmax}) permaneció como referencia por ofrecer el mejor compromiso entre simplicidad de despliegue y desempeño en Prometheus. La tabla~\ref{tab:tuning-candidatos} resume los candidatos evaluados.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \footnotesize
 \caption{Exploración de configuraciones alternativas (\texttt{tune\_model.py}).}
@@ -422,11 +432,11 @@ Dos decisiones de preprocesamiento resultaron determinantes y se documentaron ex
 \section{Integración e implementación del sistema}
 \label{sec:integracion}
 
-Esta sección describe el servicio de inferencia en contenedor, la gestión de alertas hacia Opsgenie, los enlaces contextuales a Grafana y el despliegue en los entornos demo y productivo.
+Esta sección describe el servicio de inferencia en contenedor, la gestión de alertas hacia Opsgenie, los enlaces contextuales a Grafana y el despliegue en los entornos de simulacion y productivo.
 
 \subsection{Servicio de inferencia}
 
-El servicio de detección (\filepath{scripts/inference.py}) se ejecutó como proceso en segundo plano dentro de un contenedor Docker basado en \filepath{python:3.10-slim}. En cada ciclo, configurado cada 30~segundos en \filepath{config/data.yaml}, el servicio:
+El servicio de detección (\path{scripts/inference.py}) se ejecutó como proceso en segundo plano dentro de un contenedor Docker basado en \path{python:3.10-slim}. En cada ciclo, configurado cada 30~segundos en \path{config/data.yaml}, el servicio:
 
 \begin{enumerate}
 \item Obtuvo las métricas de los últimos 10~minutos desde Prometheus (o desde el generador sintético en el entorno demo).
@@ -460,7 +470,7 @@ La integración con Opsgenie se implementó en \texttt{OpsgenieClient}, que envi
 \item Enlace al panel de Grafana acotado al intervalo de la ventana afectada (generado por \texttt{GrafanaLinkGenerator}).
 \end{itemize}
 
-Para mitigar la fatiga de alertas se configuraron mecanismos en \filepath{config/alerting.yaml}:
+Para mitigar la fatiga de alertas se configuraron mecanismos en \path{config/alerting.yaml}:
 
 \begin{itemize}
 \item Filtrado por confianza mínima: descartar ciclos cuyo exceso sobre el umbral fuera inferior al 25~\%.
@@ -471,8 +481,6 @@ Para mitigar la fatiga de alertas se configuraron mecanismos en \filepath{config
 \end{itemize}
 
 Estos controles se definieron en colaboración con operaciones para equilibrar sensibilidad y volumen de notificaciones.
-
-La tabla~\ref{tab:opsgenie-prioridad} relaciona la confianza $c$ con la prioridad asignada en Opsgenie. Las alertas de escalamiento, emitidas cuando un incidente supera 30~minutos, elevaron la prioridad a P2 de forma automática para distinguirlas de la apertura inicial.
 
 \subsection{Enlaces contextuales a Grafana}
 
@@ -486,7 +494,7 @@ En el perfil \texttt{dev} de Docker Compose, el detector comparte red puente con
 
 La tabla~\ref{tab:config-yaml} resume los archivos de configuración que parametrizan el sistema sin recompilar la imagen.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Archivos de configuración YAML del sistema.}
@@ -495,19 +503,19 @@ La tabla~\ref{tab:config-yaml} resume los archivos de configuración que paramet
 \toprule
 \textbf{Archivo} & \textbf{Parámetros principales} \\
 \midrule
-\filepath{config/data.yaml} & URL de Prometheus, consultas PromQL, cotas de normalización, intervalos de muestreo \\
-\filepath{config/windowing.yaml} & Tamaño de ventana (20) y stride de entrenamiento (1) \\
-\filepath{config/model.yaml} & Capas del autoencoder, hiperparámetros de entrenamiento \\
-\filepath{config/alerting.yaml} & Método de umbral, credenciales Opsgenie, reglas de deduplicación y enlaces Grafana \\
+\path{config/data.yaml} & URL de Prometheus, consultas PromQL, cotas de normalización, intervalos de muestreo \\
+\path{config/windowing.yaml} & Tamaño de ventana (20) y stride de entrenamiento (1) \\
+\path{config/model.yaml} & Capas del autoencoder, hiperparámetros de entrenamiento \\
+\path{config/alerting.yaml} & Método de umbral, credenciales Opsgenie, reglas de deduplicación y enlaces Grafana \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-El contenedor se construyó con un \filepath{Dockerfile} multi-etapa mínimo: instalación de dependencias Python desde \filepath{requirements.txt}, copia del código fuente y arranque de \filepath{inference.py} con usuario sin privilegios. Los directorios \filepath{models/}, \filepath{config/} y \filepath{logs/} se montaron como volúmenes para permitir actualizar pesos y umbrales sin reconstruir la imagen. Los límites de recursos (1 CPU virtual y 2~GB de RAM) resultaron suficientes para el ciclo de 30~segundos en las pruebas de despliegue realizadas.
+El contenedor se construyó con un \path{Dockerfile} multi-etapa mínimo: instalación de dependencias Python desde \path{requirements.txt}, copia del código fuente y arranque de \path{inference.py} con usuario sin privilegios. Los directorios \path{models/}, \path{config/} y \path{logs/} se montaron como volúmenes para permitir actualizar pesos y umbrales sin reconstruir la imagen. Los límites de recursos (1 CPU virtual y 2~GB de RAM) resultaron suficientes para el ciclo de 30~segundos en las pruebas de despliegue realizadas.
 
 La tabla~\ref{tab:demo-vs-prod} contrasta el perfil \texttt{dev} de Docker Compose con el despliegue productivo. En la organización cliente, únicamente el servicio \texttt{anomaly-detection} se agregó a la infraestructura existente; los servicios auxiliares del perfil \texttt{dev} cumplieron exclusivamente fines de desarrollo y demostración académica.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Comparación entre entorno demo y despliegue productivo.}
@@ -521,14 +529,14 @@ Servicio simulado & Activo (\texttt{mock-service}) & No desplegado \\
 Grafana / Prometheus auxiliares & Contenedores locales & Instancias ya existentes \\
 Contenedor detector & \texttt{tv-anomaly-detector} & Misma imagen, red interna AWS \\
 Credenciales Opsgenie & Variables de entorno & Secretos del entorno cliente \\
-Actualización de modelos & Volumen montado \filepath{./models} & Montaje equivalente en prod \\
+Actualización de modelos & Volumen montado \path{./models} & Montaje equivalente en prod \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Registro, trazabilidad y requisitos no funcionales}
 
-El servicio registró cada ciclo en \filepath{logs/} con nivel configurable: operación normal en depuración, anomalías confirmadas en advertencia y fallos de consulta en error. Cuando se detectó una anomalía, el registro incluyó las métricas instantáneas y el promedio sobre la ventana de inferencia. Esos datos complementaron la comparación original vs.\ reconstruida que viaja en el \textit{payload} de Opsgenie.
+El servicio registró cada ciclo en \path{logs/} con nivel configurable: operación normal en depuración, anomalías confirmadas en advertencia y fallos de consulta en error. Cuando se detectó una anomalía, el registro incluyó las métricas instantáneas y el promedio sobre la ventana de inferencia. Esos datos complementaron la comparación original vs.\ reconstruida que viaja en el \textit{payload} de Opsgenie.
 
 Desde el punto de vista de seguridad, el contenedor se ejecutó sin privilegios de superusuario, las credenciales de Opsgenie se inyectaron por variables de entorno (no se versionaron en el repositorio) y la red de monitoreo del perfil \texttt{dev} no expuso el detector hacia internet.
 

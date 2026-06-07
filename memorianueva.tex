@@ -22,8 +22,10 @@
 \usepackage[utf8]{inputenc} % Codificación de entrada UTF-8
 \usepackage[T1]{fontenc}    % Codificación de salida para caracteres especiales
 \usepackage{graphicx}       % Manejo de gráficos
+\usepackage{listings}       % Para el comando \filepath
 \usepackage{eso-pic}        % Permite agregar fondos
 \usepackage{hyperref}       % Manejo de hipervínculos y marcadores
+\usepackage{amsmath}
 
 % Redefinición de caracteres problemáticos en marcadores
 \hypersetup{
@@ -77,7 +79,11 @@
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Agregar resumen al índice
-En la presente memoria se describe el diseño y la implementación de un sistema de detección de anomalías para un servicio de televisión por protocolo de internet basado en interfaces de programación de aplicaciones, desarrollado para una empresa proveedora de plataformas de video sobre infraestructura en la nube. Para su concreción, fue necesaria la aplicación de aprendizaje profundo sobre series temporales mediante un autoencoder con redes neuronales recurrentes de memoria a largo plazo, junto con técnicas de ingeniería de características y de integración con sistemas de observabilidad de software como Prometheus, Grafana y Opsgenie.
+En la presente memoria se describe el diseño y la implementación de un sistema de detección de anomalías para un servicio de televisión por protocolo de internet basado en interfaces de programación de aplicaciones. 
+
+El trabajo fue desarrollado para una empresa proveedora de plataformas de video sobre infraestructura en la nube. 
+
+Para su concreción, fue necesaria la aplicación de aprendizaje profundo sobre series temporales mediante un autoencoder con redes neuronales recurrentes de memoria a largo plazo, junto con técnicas de ingeniería de características y de integración con sistemas de observabilidad de software como Prometheus, Grafana y Opsgenie.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------

@@ -55,11 +55,11 @@ Entre los enfoques de aprendizaje profundo para series temporales, Malhotra et a
 
 Paralelamente, los ecosistemas de observabilidad comercial integran funciones de detección asistida o modelos propietarios sobre telemetría ya ingestada. Esas soluciones priorizan la integración con la plataforma, pero suelen ofrecer poco control sobre el entrenamiento, el umbral y la auditoría del modelo. 
 
-La propuesta de este trabajo se acopla al \textit{stack} Prometheus--Grafana--Opsgenie \citep{salituro2020grafana, grafana_site, opsgenie_site} ya adoptado en la organización. Mantiene la configuración, el entrenamiento y la inferencia bajo control del operador. Así se busca un equilibrio entre sensibilidad y falsos positivos calibrable con el equipo de operaciones.
+La propuesta de este trabajo se acopla al \textit{stack} Prometheus--Grafana--Opsgenie \citep{salituro2020grafana, grafana_site, opsgenie_site} ya adoptado en la organización. Así se busca un equilibrio entre sensibilidad y falsos positivos calibrable con el equipo de operaciones.
 
 La tabla~\ref{tab:comparativa-enfoques} resume familias de enfoques y su relación típica con datos y métricas de evaluación. La tabla~\ref{tab:trabajos-referencia} sitúa de manera orientativa trabajos de referencia y la línea elegida en este trabajo. Ninguna de las dos pretende ser exhaustiva, sino ubicar la propuesta en el panorama habitual de ingeniería de confiabilidad y aprendizaje automático.
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \caption{Comparación sintética de enfoques para detección de anomalías en métricas operativas (orientación conceptual).}
 \label{tab:comparativa-enfoques}
@@ -75,7 +75,7 @@ Productos comerciales de observabilidad & Algoritmos propietarios, a veces combi
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[h]
 \centering
 \small
 \caption{Trabajos de referencia y línea adoptada en esta memoria (orientación conceptual).}
