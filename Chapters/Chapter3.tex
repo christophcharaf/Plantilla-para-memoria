@@ -2,7 +2,7 @@
 \label{Chapter3}
 \begingroup\sloppy\setlength{\emergencystretch}{2.5em}
 
-En el presente capítulo se describe el diseño e implementación del sistema de detección de anomalías: el pipeline de datos desde Prometheus hasta las ventanas multivariadas, la arquitectura del autoencoder LSTM, el procedimiento de entrenamiento y calibración del umbral, y la integración del servicio de inferencia con Opsgenie y Grafana.
+En este capítulo se describe el diseño e implementación del sistema de detección de anomalías: el pipeline de datos desde Prometheus hasta las ventanas multivariadas, la arquitectura del autoencoder LSTM, el procedimiento de entrenamiento y calibración del umbral, y la integración del servicio de inferencia con Opsgenie y Grafana.
 
 \section{Pipeline de datos}
 \label{sec:pipeline-datos}
@@ -182,9 +182,7 @@ El repositorio entregable agrupó la lógica en cuatro paquetes bajo \path{src/}
 
 Un requisito no funcional central del diseño fue garantizar que una ventana procesada en producción fuera indistinguible, desde el punto de vista del modelo, de una ventana equivalente obtenida durante el entrenamiento.
 
-Cualquier divergencia en el orden de transformaciones, en las columnas activas o en la política de ventanas se tradujo en errores de reconstrucción artificialmente elevados y en falsos positivos masivos, fenómeno reproducido al comparar un escalado adaptativo entrenado con datos sintéticos contra consultas reales a Prometheus.
-
-Para cerrar esa brecha se adoptaron tres medidas concretas.
+Cualquier divergencia en el orden de transformaciones, en las columnas activas o en la política de ventanas se tradujo en errores de reconstrucción artificialmente elevados y en falsos positivos masivos, fenómeno reproducido al comparar un escalado adaptativo entrenado con datos sintéticos contra consultas reales a Prometheus.Para cerrar esa brecha se adoptaron tres medidas concretas.
 
 Primero, el mismo objeto \texttt{DataPreprocessor} serializado se cargó en inferencia sin reajuste sobre datos recientes. Segundo, las consultas PromQL y las reglas de agregación se leyeron del mismo archivo \path{config/data.yaml} en ambos modos. Tercero, la generación de ventanas en inferencia utilizó exclusivamente los últimos $T$ puntos completos, mientras que en entrenamiento se generó el conjunto completo con stride~$=1$, pero aplicando la misma función de extracción por ventana.
 
@@ -209,15 +207,15 @@ Salida del modelo & Pérdida MSE + umbral & Error $e$ vs.\ $\tau$ + alerta \\
 \end{tabular}
 \end{table}
 
-\section{Arquitectura del modelo}
+\section{Arquitectura del sistema}
 \label{sec:arquitectura-modelo}
 
-A continuación, en la figura \ref{fig:infra_demo.png} se ilustra la arquitectura del sistema desarrollado, desde el servicio simulado en Flask hasta la visualización y alertas por Grafana y Opsgenie respectivamente 
+A continuación, en la figura \ref{fig:infra_demo.png} se ilustra la arquitectura del sistema desarrollado, desde el servicio simulado en Flask hasta la visualización y alertas por Grafana y Opsgenie respectivamente. 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.92\textwidth]{./Figures/infra_demo.png}
-\caption{Estructura lógica de ventanas deslizantes.}
+\includegraphics[width=0.9\linewidth]{./Figures/infra_demo.png}
+\caption{Estructura del sistema de detección.}
 \label{fig:infra_demo.png}
 \end{figure}
 
@@ -267,6 +265,8 @@ c = \frac{e - \tau}{\tau} \quad \text{cuando } e > \tau
 \end{equation}
 y $c = 0$ en caso contrario. Valores de $c$ más altos indicaron un apartamiento más marcado del régimen nominal aprendido.
 
+Esos valores se utilizaron para asignar prioridad en Opsgenie (tabla~\ref{tab:opsgenie-prioridad}).
+
 \begin{table}[h]
 \centering
 \small
@@ -284,7 +284,7 @@ P4 & $c \leq 0{,}5$ & Registro sin escalamiento urgente \\
 \end{tabular}
 \end{table}
 
-Esos valores se utilizaron para asignar prioridad en Opsgenie (tabla~\ref{tab:opsgenie-prioridad}).
+
 
 \subsection{Acoplamiento multivariado y espacio latente}
 
@@ -318,11 +318,61 @@ La activación lineal en la capa de salida preservó la interpretabilidad de las
 
 Los pesos entrenados y la configuración estructural se serializaron por separado (\path{lstm\_autoencoder.weights.h5} y \path{lstm\_autoencoder\_config.json}) para reconstruir el grafo computacional en inferencia sin acoplarse a una versión concreta del entorno de entrenamiento.
 
-\section{Entrenamiento y optimización}
+\section{Entrenamiento, evaluación y optimización}
 \label{sec:entrenamiento}
 
 Esta sección documenta el procedimiento de entrenamiento del autoencoder, la calibración del umbral de detección y la exploración acotada de hiperparámetros alternativos.
 
+La evaluación del sistema se concibió en función de indicadores operativos verificables: tasa de falsos positivos sobre tramos considerados nominales, capacidad de señalar degradaciones acordadas con el equipo de operaciones y tiempo entre el inicio de un patrón anómalo y la emisión de la alerta. Esos criterios orientan los ensayos del capítulo correspondiente y permiten contrastar el enfoque aprendido frente a líneas base por umbrales fijos.
+
+\subsection{Características del dataset}
+
+Cada observación temporal del conjunto consta de cinco métricas técnicas del servicio, seleccionadas para cubrir carga, experiencia del usuario y salud del proceso:
+
+\begin{enumerate}
+\item \texttt{request\_rate}: tasa de peticiones HTTP por segundo.
+\item \texttt{latency\_p95}: percentil 95 de la latencia de respuesta.
+\item \texttt{memory\_usage}: memoria residente del proceso.
+\item \texttt{error\_rate}: tasa de respuestas erróneas por segundo.
+\item \texttt{cpu\_usage}: fracción de CPU consumida.
+\end{enumerate}
+
+Sobre estas métricas se derivaron seis variables temporales adicionales mediante codificación cíclica de la hora y del día de la semana, junto con indicadores de fin de semana y horario nocturno. La tabla~\ref{tab:dataset} sintetiza las características del conjunto antes y después de la transformación a ventanas deslizantes de 20 pasos (10~minutos).
+
+\begin{table}
+\centering
+\small
+\caption{Descripción del conjunto de datos utilizado para entrenamiento y evaluación.}
+\label{tab:dataset}
+\begin{tabular}{@{}p{0.34\textwidth}p{0.58\textwidth}@{}}
+\toprule
+\textbf{Atributo} & \textbf{Valor o descripción} \\
+\midrule
+Origen de datos & Prometheus (instancia interna) con simulador y generador sintético de núcleo compartido para desarrollo. \\
+Confidencialidad & Telemetría productiva no publicada; figuras ilustrativas con datos sintéticos. \\
+Período cubierto & 90~días corridos previos al entrenamiento. \\
+Intervalo de muestreo & 30~segundos. \\
+Cantidad aproximada de muestras & 259\,200 puntos por métrica. \\
+Métricas técnicas & \texttt{request\_rate}, \texttt{latency\_p95}, \texttt{memory\_usage}, \texttt{error\_rate} y \texttt{cpu\_usage}. \\
+Variables temporales derivadas & \texttt{hour\_sin}, \texttt{hour\_cos}, \texttt{dayofweek\_sin}, \texttt{dayofweek\_cos}, \texttt{is\_weekend} e \texttt{is\_night}. \\
+Dimensión de cada ventana & 20 pasos $\times$ 11 variables. \\
+Longitud temporal de la ventana & 10~minutos. \\
+Particionado entrenamiento / validación & 80~\% / 20~\% en orden temporal (último tramo como validación). \\
+Etiquetas & Régimen no supervisado: entrenamiento sobre tramos nominales. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La figura~\ref{fig:dataset-dist} muestra la distribución marginal de las cinco métricas técnicas sobre datos sintéticos ilustrativos con estacionalidad diaria compatible con el \textit{mock service}. Se incluye únicamente con fines demostrativos, dado que no corresponde publicar histogramas de la telemetría real.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.92\textwidth]{./Figures/dataset_distribution.png}
+\caption{Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}
+\label{fig:dataset-dist}
+\end{figure}
+
+Cabe aclarar que el problema se planteó como detección no supervisada: el conjunto de entrenamiento se compuso de tramos en los que el servicio operó dentro de su régimen nominal y no se dispuso de un etiquetado fiable de anomalías históricas a la escala del dataset completo.
 \subsection{Procedimiento de entrenamiento}
 
 El script \path{scripts/train.py} orquestó el flujo completo: carga de configuración, obtención de datos, preprocesamiento, generación de ventanas, entrenamiento, persistencia de artefactos y cálculo del umbral. Los hiperparámetros principales se fijaron en \path{config/model.yaml} y se resumen en la tabla~\ref{tab:hiperparametros}.
@@ -425,14 +475,14 @@ Los criterios de selección combinaron la pérdida de validación, el margen ent
 Dos decisiones de preprocesamiento resultaron determinantes y se documentaron explícitamente por su impacto en la tasa de falsos positivos:
 
 \begin{enumerate}
-\item Sustituir el escalado adaptativo por \texttt{fixed\_minmax}, con lo cual se eliminó el desajuste entre la distribución de entrenamiento y series productivas con distinta escala absoluta.
-\item Reducir el stride de ventanas de 20 a 1, con lo cual aumentó en un factor del orden de 20 la cantidad de ejemplos de entrenamiento y mejoró la representación de patrones circadianos en el espacio latente.
+\item Sustituir el escalado adaptativo por \texttt{fixed\_minmax}, lo que eliminó el desajuste entre la distribución de entrenamiento y series productivas con distinta escala absoluta.
+\item Reducir el stride de ventanas de 20 a 1, lo que aumentó en un factor del orden de 20 la cantidad de ejemplos de entrenamiento y mejoró la representación de patrones circadianos en el espacio latente.
 \end{enumerate}
 
 \section{Integración e implementación del sistema}
 \label{sec:integracion}
 
-Esta sección describe el servicio de inferencia en contenedor, la gestión de alertas hacia Opsgenie, los enlaces contextuales a Grafana y el despliegue en los entornos de simulacion y productivo.
+Esta sección describe el servicio de inferencia en contenedor, la gestión de alertas hacia Opsgenie, los enlaces contextuales a Grafana y el despliegue en los entornos de simulación y productivo.
 
 \subsection{Servicio de inferencia}
 

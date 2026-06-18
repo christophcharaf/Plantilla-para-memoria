@@ -58,54 +58,7 @@ Por ese motivo, el material reproducible del trabajo, incluido el repositorio en
 
 Esta separación no implica que el modelo se haya entrenado únicamente con datos sintéticos: el régimen nominal utilizado para el aprendizaje provino de Prometheus interno. El simulador permitió desarrollar y validar el \textit{pipeline} de forma reproducible, ejecutar demostraciones sin acceso a la red de producción y documentar el sistema sin exponer series identificables para los fines académicos de este trabajo.
 
-\subsection{Características del conjunto de datos}
-
-Cada observación temporal del conjunto consta de cinco métricas técnicas del servicio, seleccionadas para cubrir carga, experiencia del usuario y salud del proceso:
-
-\begin{enumerate}
-\item \texttt{request\_rate}: tasa de peticiones HTTP por segundo.
-\item \texttt{latency\_p95}: percentil 95 de la latencia de respuesta.
-\item \texttt{memory\_usage}: memoria residente del proceso.
-\item \texttt{error\_rate}: tasa de respuestas erróneas por segundo.
-\item \texttt{cpu\_usage}: fracción de CPU consumida.
-\end{enumerate}
-
-Sobre estas métricas se derivaron seis variables temporales adicionales mediante codificación cíclica de la hora y del día de la semana, junto con indicadores de fin de semana y horario nocturno. La tabla~\ref{tab:dataset} sintetiza las características del conjunto antes y después de la transformación a ventanas deslizantes de 20 pasos (10~minutos).
-
-\begin{table}[h]
-\centering
-\small
-\caption{Descripción del conjunto de datos utilizado para entrenamiento y evaluación.}
-\label{tab:dataset}
-\begin{tabular}{@{}p{0.34\textwidth}p{0.58\textwidth}@{}}
-\toprule
-\textbf{Atributo} & \textbf{Valor o descripción} \\
-\midrule
-Origen de datos & Prometheus (instancia interna) con simulador y generador sintético de núcleo compartido para desarrollo. \\
-Confidencialidad & Telemetría productiva no publicada; figuras ilustrativas con datos sintéticos. \\
-Período cubierto & 90~días corridos previos al entrenamiento. \\
-Intervalo de muestreo & 30~segundos. \\
-Cantidad aproximada de muestras & 259\,200 puntos por métrica. \\
-Métricas técnicas & \texttt{request\_rate}, \texttt{latency\_p95}, \texttt{memory\_usage}, \texttt{error\_rate} y \texttt{cpu\_usage}. \\
-Variables temporales derivadas & \texttt{hour\_sin}, \texttt{hour\_cos}, \texttt{dayofweek\_sin}, \texttt{dayofweek\_cos}, \texttt{is\_weekend} e \texttt{is\_night}. \\
-Dimensión de cada ventana & 20 pasos $\times$ 11 variables. \\
-Longitud temporal de la ventana & 10~minutos. \\
-Particionado entrenamiento / validación & 80~\% / 20~\% en orden temporal (último tramo como validación). \\
-Etiquetas & Régimen no supervisado: entrenamiento sobre tramos nominales. \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-La figura~\ref{fig:dataset-dist} muestra la distribución marginal de las cinco métricas técnicas sobre datos sintéticos ilustrativos con estacionalidad diaria compatible con el \textit{mock service}. Se incluye únicamente con fines demostrativos, dado que no corresponde publicar histogramas de la telemetría real.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.92\textwidth]{./Figures/dataset_distribution.png}
-\caption{Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}
-\label{fig:dataset-dist}
-\end{figure}
-
-Cabe aclarar que el problema se planteó como detección no supervisada: el conjunto de entrenamiento se compuso de tramos en los que el servicio operó dentro de su régimen nominal y no se dispuso de un etiquetado fiable de anomalías históricas a la escala del dataset completo.
+\subsection{Datasets de entrenamiento utilizados}
 
 Al tratarse de telemetría propia de un servicio en producción, no se utilizaron \textit{datasets} públicos como fuente principal. El dominio (calidad de servicio en \textit{streaming} sobre infraestructura específica) no encuentra equivalencia directa en repositorios abiertos como Numenta NAB \citep{numenta_nab} o Yahoo Webscope \citep{yahoo_webscope}, que agrupan series heterogéneas con distinto muestreo y sin el stack Prometheus del cliente.
 
@@ -152,5 +105,38 @@ Destino de despliegue productivo & Infraestructura propia de la empresa cliente 
 \bottomrule
 \end{tabular}
 \end{table}
+
+\section{Métricas de evaluación}
+\label{sec:metricas-evaluacion}
+
+La evaluación del sistema combinó dos planos complementarios. En el primero se valoró la calidad de reconstrucción del autoencoder, base del aprendizaje no supervisado, mediante el error cuadrático medio (MSE) como función de pérdida y señal escalar de anomalía, y el error absoluto medio (MAE) como métrica auxiliar de monitoreo. En el segundo se valoró la capacidad de detección sobre ventanas con anomalías sintéticas inyectadas, para lo cual se emplearon métricas de clasificación binaria habituales: precisión, \textit{recall}, \textit{F1-score} y tasa de falsos positivos. La distinción entre ambos planos respondió al carácter no supervisado del entrenamiento: las métricas de clasificación solo pudieron computarse en escenarios controlados con anomalías conocidas, mientras que el error de reconstrucción se midió de forma continua sobre tramos nominales.
+
+La tabla~\ref{tab:metricas-evaluacion} resume las métricas utilizadas, su definición y el propósito que cumplieron en la validación del sistema.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Métricas de evaluación utilizadas para la validación del sistema.}
+\label{tab:metricas-evaluacion}
+\begin{tabular}{@{}p{0.24\textwidth}p{0.30\textwidth}p{0.36\textwidth}@{}}
+\toprule
+\textbf{Métrica} & \textbf{Definición} & \textbf{Propósito en la evaluación} \\
+\midrule
+MSE & Error cuadrático medio entre la ventana de entrada y su reconstrucción. & Función de pérdida del entrenamiento y señal escalar de anomalía en inferencia. \\
+\addlinespace
+MAE & Error absoluto medio entre entrada y reconstrucción. & Métrica auxiliar de monitoreo durante el entrenamiento, menos sensible a valores atípicos. \\
+\addlinespace
+Precisión & Fracción de ventanas marcadas como anómalas que efectivamente lo eran. & Controlar la proporción de falsas alertas elevadas al servicio de guardia. \\
+\addlinespace
+\textit{recall} & Fracción de anomalías reales correctamente detectadas. & Medir la cobertura de incidentes ante anomalías sintéticas inyectadas. \\
+\addlinespace
+\textit{F1-score} & Media armónica de precisión y exhaustividad. & Resumir en un único valor el compromiso entre falsas alertas y cobertura. \\
+\addlinespace
+Tasa de falsos positivos & Fracción de ventanas nominales marcadas erróneamente como anómalas. & Verificar la estabilidad del umbral sobre tramos de régimen nominal. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El procedimiento concreto de cálculo de estas métricas, la calibración del umbral sobre la distribución de errores de validación y los resultados cuantitativos obtenidos se detallan en los capítulos de diseño y de resultados.
 
 
