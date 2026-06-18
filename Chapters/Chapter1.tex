@@ -6,7 +6,7 @@
 
 En el presente capítulo se contextualiza la detección de anomalías en servicios de televisión por protocolo de internet (TV-over-IP) \citep{itu_iptv_overview}. Se revisa el estado del arte de forma breve y se enuncian los objetivos del trabajo.
 
-\section{Introducción general al tema}
+\section{Servicios de TV-over-IP y desafíos operativos}
 
 Los servicios de video bajo demanda y de transmisión lineal sobre redes IP consolidaron en la última década un modelo en que la calidad percibida por el usuario depende tanto de la disponibilidad de los componentes de \textit{backend} como del desempeño de la cadena completa: balanceadores, microservicios, bases de datos, colas de mensajes y sistemas de caché, entre otros. La operación de estos sistemas se apoya de manera casi universal en la recolección periódica de métricas técnicas (latencias, tasas de error, uso de CPU o memoria, etc.) que describen el estado del servicio en el tiempo.
 
@@ -93,9 +93,7 @@ Propuesta de esta memoria & Autoencoder LSTM & Telemetría operativa de TV-over-
 
 \section{Objetivos del trabajo}
 
-El objetivo general del trabajo consistió en diseñar e implementar un sistema inteligente capaz de detectar anomalías en tiempo de operación compatible con el monitoreo existente en un servicio de TV-over-IP basado en API, mediante un autoencoder LSTM entrenado sobre ventanas de métricas obtenidas desde Prometheus, con integración de alertas y enlaces de contexto con Opsgenie y Grafana, con miras a mejorar la capacidad de reacción frente a incidentes sin depender exclusivamente de umbrales estáticos ni de servicios de terceros para el núcleo analítico.
-
-La evaluación del sistema se concibió en función de indicadores operativos verificables: tasa de falsos positivos sobre tramos considerados nominales, capacidad de señalar degradaciones acordadas con el equipo de operaciones y tiempo entre el inicio de un patrón anómalo y la emisión de la alerta. Esos criterios orientan los ensayos del capítulo correspondiente y permiten contrastar el enfoque aprendido frente a líneas base por umbrales fijos.
+El objetivo general del trabajo consistió en diseñar e implementar un sistema inteligente capaz de detectar anomalías en tiempo de operación, compatible con el monitoreo existente en un servicio de TV-over-IP basado en API, aprovechando la integración con sistemas de monitoreo y alertas para mejorar la capacidad de reacción frente a incidentes. Esto permite, por otra parte, evitar la dependencia de umbrales estáticos o problemas de seguridad al utilizar servicios de terceros.
 
 Los objetivos específicos, formulados de manera verificable, fueron los siguientes:
 
