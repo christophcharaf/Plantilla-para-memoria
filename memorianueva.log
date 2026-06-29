@@ -1,7 +1,6 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.5.1)  7 JUN 2026 14:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.5.1)  29 JUN 2026 18:54
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
 **./memorianueva.tex
 (memorianueva.tex
@@ -803,6 +802,11 @@ LaTeX Font Info:    Trying to load font information for T1+ppl on input line 11
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1ppl.fd
 File: t1ppl.fd 2001/06/04 font definitions for T1/ppl.
 ))
+(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/eso-pic\eso-pic.sty
+Package: eso-pic 2025/12/10 v3.0d eso-pic (RN)
+\ESO@tempdima=\dimen198
+\ESO@tempdimb=\dimen199
+)
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
 Package: amsmath 2025/07/09 v2.17z AMS math features
 \@mathmargin=\skip81
@@ -810,7 +814,7 @@ Package: amsmath 2025/07/09 v2.17z AMS math features
 For additional information on amsmath, use the `?' option.
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen198
+\pmbraise@=\dimen256
 )
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
@@ -832,7 +836,7 @@ LaTeX Info: Redefining \big on input line 721.
 LaTeX Info: Redefining \Big on input line 722.
 LaTeX Info: Redefining \bigg on input line 723.
 LaTeX Info: Redefining \Bigg on input line 724.
-\big@size=\dimen199
+\big@size=\dimen257
 LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
 \macc@depth=\count476
@@ -850,12 +854,12 @@ LaTeX Info: Redefining \Relbar on input line 970.
 \column@=\count481
 \maxfields@=\count482
 \andhelp@=\toks28
-\eqnshift@=\dimen256
-\alignsep@=\dimen257
-\tagshift@=\dimen258
-\tagwidth@=\dimen259
-\totwidth@=\dimen260
-\lineht@=\dimen261
+\eqnshift@=\dimen258
+\alignsep@=\dimen259
+\tagshift@=\dimen260
+\tagwidth@=\dimen261
+\totwidth@=\dimen262
+\lineht@=\dimen263
 \@envbody=\toks29
 \multlinegap=\skip82
 \multlinetaggap=\skip83
@@ -863,70 +867,40 @@ LaTeX Info: Redefining \Relbar on input line 970.
 LaTeX Info: Redefining \[ on input line 2950.
 LaTeX Info: Redefining \] on input line 2951.
 )
-(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count483
-\float@exts=\toks31
-\float@box=\box72
-\@float@everytoks=\toks32
-\@floatcapt=\box73
-)
-(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/floatbytocbasic\floatby
-tocbasic.sty
-Package: floatbytocbasic 2023-08-16 v1.0 improved float package using tocbasic
-
-(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/koma-script\tocbasic.st
-y
-Package: tocbasic 2026/02/02 v3.49.2 KOMA-Script package (handling toc-files)
-\scr@dte@tocline@numberwidth=\skip84
-\scr@dte@tocline@numbox=\box74
-) (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/xpatch\xpatch.sty
-Package: xpatch 2020/03/25 v0.3a Extending etoolbox patching commands
-))
-(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/eso-pic\eso-pic.sty
-Package: eso-pic 2025/12/10 v3.0d eso-pic (RN)
-\ESO@tempdima=\dimen262
-\ESO@tempdimb=\dimen263
-)
-(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/xurl\xurl.sty
-Package: xurl 2022/01/09 v 0.10 modify URL breaks
-
-xurl: Set penalties for biblatex
-)
-Package hyperref Info: Option `unicode' set `true' on input line 53.
-Package hyperref Info: Option `colorlinks' set `true' on input line 53.
+Package hyperref Info: Option `unicode' set `true' on input line 41.
+Package hyperref Info: Option `colorlinks' set `true' on input line 41.
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
- (memorianueva.aux (portada.aux)
+
+(memorianueva.aux (portada.aux)
 LaTeX Info: Redefining \. on input line 16.
 LaTeX Info: Redefining \% on input line 16.
 Package babel Info: 'spanish' activates 'spanish' shorthands.
 (babel)             Reported on input line 16.
- (Chapters/Chapter1.aux)
-(Chapters/Chapter2.aux) (Chapters/Chapter3.aux) (Chapters/Chapter4.aux)
-(Chapters/Chapter5.aux))
+ (Chapters/Chapter1.aux) (Chapters/Chapter2.aux) (Chapters/Chapter3.aux) (Chapt
+ers/Chapter4.aux) (Chapters/Chapter5.aux))
 \openout1 = `memorianueva.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Info: Redefining \. on input line 75.
-LaTeX Info: Redefining \% on input line 75.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 63.
+LaTeX Font Info:    ... okay on input line 63.
+LaTeX Info: Redefining \. on input line 63.
+LaTeX Info: Redefining \% on input line 63.
 
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/translations/dicts\tran
 slations-basic-dictionary-spanish.trsl
@@ -934,40 +908,46 @@ File: translations-basic-dictionary-spanish.trsl (spanish translation file `tra
 nslations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `spanish'. on input line 75.
+or `spanish'. on input line 63.
 
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count484
+\scratchcounter=\count483
 \scratchdimen=\dimen264
-\scratchbox=\box75
-\nofMPsegments=\count485
-\nofMParguments=\count486
-\everyMPshowfont=\toks33
-\MPscratchCnt=\count487
+\scratchbox=\box72
+\nofMPsegments=\count484
+\nofMParguments=\count485
+\everyMPshowfont=\toks31
+\MPscratchCnt=\count486
 \MPscratchDim=\dimen265
-\MPnumerator=\count488
-\makeMPintoPDFobject=\count489
-\everyMPtoPDFconversion=\toks34
+\MPnumerator=\count487
+\makeMPintoPDFobject=\count488
+\everyMPtoPDFconversion=\toks32
 )
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
 ase.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+
+(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/grfext\grfext.sty
+Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
+)
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 504.
 
 (C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
 Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-\c@lstlisting=\count490
-Package tocbasic Info: setting babel extension for `lol' on input line 75.
+\c@lstlisting=\count489
 Package biblatex Info: Trying to load language 'spanish'...
 Package biblatex Info: ... file 'spanish.lbx' found.
 
@@ -986,44 +966,44 @@ Package biblatex Info: Data encoding 'utf8' specified.
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'memorianueva.bbl' found.
  (memorianueva.bbl)
-Package biblatex Info: Reference section=0 on input line 75.
-Package biblatex Info: Reference segment=0 on input line 75.
-Package hyperref Info: Link coloring ON on input line 75.
+Package biblatex Info: Reference section=0 on input line 63.
+Package biblatex Info: Reference segment=0 on input line 63.
+Package hyperref Info: Link coloring ON on input line 63.
  (memorianueva.out) (memorianueva.out)
 \@outlinefile=\write4
 \openout4 = `memorianueva.out'.
 
-LaTeX Info: Redefining \sptext on input line 75.
-LaTeX Info: Redefining \lsc on input line 75.
-LaTeX Info: Redefining \. on input line 75.
-LaTeX Info: Redefining \% on input line 75.
-LaTeX Info: Redefining \dotlessi on input line 75.
-Package scrbase Info: activating spanish \lstlistingname on input line 75.
-LaTeX Info: Redefining \sptext on input line 75.
-LaTeX Info: Redefining \lsc on input line 75.
-LaTeX Info: Redefining \. on input line 75.
-LaTeX Info: Redefining \% on input line 75.
-LaTeX Info: Redefining \dotlessi on input line 75.
-Package scrbase Info: activating spanish \acknowledgementname on input line 75.
+LaTeX Info: Redefining \sptext on input line 63.
+LaTeX Info: Redefining \lsc on input line 63.
+LaTeX Info: Redefining \. on input line 63.
+LaTeX Info: Redefining \% on input line 63.
+LaTeX Info: Redefining \dotlessi on input line 63.
+Package scrbase Info: activating spanish \lstlistingname on input line 63.
+LaTeX Info: Redefining \sptext on input line 63.
+LaTeX Info: Redefining \lsc on input line 63.
+LaTeX Info: Redefining \. on input line 63.
+LaTeX Info: Redefining \% on input line 63.
+LaTeX Info: Redefining \dotlessi on input line 63.
+Package scrbase Info: activating spanish \acknowledgementname on input line 63.
 
-LaTeX Info: Redefining \sptext on input line 75.
-LaTeX Info: Redefining \lsc on input line 75.
-LaTeX Info: Redefining \. on input line 75.
-LaTeX Info: Redefining \% on input line 75.
-LaTeX Info: Redefining \dotlessi on input line 75.
-Package scrbase Info: activating spanish \authorshipname on input line 75.
-LaTeX Info: Redefining \sptext on input line 75.
-LaTeX Info: Redefining \lsc on input line 75.
-LaTeX Info: Redefining \. on input line 75.
-LaTeX Info: Redefining \% on input line 75.
-LaTeX Info: Redefining \dotlessi on input line 75.
-Package scrbase Info: activating spanish \abbrevname on input line 75.
-LaTeX Info: Redefining \sptext on input line 75.
-LaTeX Info: Redefining \lsc on input line 75.
-LaTeX Info: Redefining \. on input line 75.
-LaTeX Info: Redefining \% on input line 75.
-LaTeX Info: Redefining \dotlessi on input line 75.
-Package scrbase Info: activating spanish \byname on input line 75.
+LaTeX Info: Redefining \sptext on input line 63.
+LaTeX Info: Redefining \lsc on input line 63.
+LaTeX Info: Redefining \. on input line 63.
+LaTeX Info: Redefining \% on input line 63.
+LaTeX Info: Redefining \dotlessi on input line 63.
+Package scrbase Info: activating spanish \authorshipname on input line 63.
+LaTeX Info: Redefining \sptext on input line 63.
+LaTeX Info: Redefining \lsc on input line 63.
+LaTeX Info: Redefining \. on input line 63.
+LaTeX Info: Redefining \% on input line 63.
+LaTeX Info: Redefining \dotlessi on input line 63.
+Package scrbase Info: activating spanish \abbrevname on input line 63.
+LaTeX Info: Redefining \sptext on input line 63.
+LaTeX Info: Redefining \lsc on input line 63.
+LaTeX Info: Redefining \. on input line 63.
+LaTeX Info: Redefining \% on input line 63.
+LaTeX Info: Redefining \dotlessi on input line 63.
+Package scrbase Info: activating spanish \byname on input line 63.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1077,7 +1057,7 @@ LaTeX Font Info:    Font shape `T1/phv/m/it' in size <10> not available
 
 pdfTeX warning: pdflatex.exe (file ./Figures/fondo.pdf): PDF inclusion: found P
 DF version <1.6>, but at most version <1.5> allowed
-<Figures/fondo.pdf, id=171, 597.55246pt x 845.07718pt>
+<Figures/fondo.pdf, id=263, 597.55246pt x 845.07718pt>
 File: Figures/fondo.pdf Graphic file (type pdf)
 <use Figures/fondo.pdf>
 Package pdftex.def Info: Figures/fondo.pdf  used on input line 51.
@@ -1118,17 +1098,6 @@ LaTeX Info: Redefining \% on input line 1.
 LaTeX Info: Redefining \sptext on input line 1.
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 6.
-
-
-(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-)
-Overfull \hbox (0.76944pt too wide) in paragraph at lines 6--6
- [][] [][][]\T1/ppl/m/n/10.95 Topología del en-torno de-mo or-ques-ta-do con Do
-c-ker Com-po-se (per- 
- []
-
 )
 \tf@lof=\write6
 \openout6 = `memorianueva.lof'.
@@ -1141,11 +1110,16 @@ c-ker Com-po-se (per-
 LaTeX Info: Redefining \sptext on input line 1.
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
-)
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 11
+.
+(C:\Users\chris\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+))
 \tf@lot=\write7
 \openout7 = `memorianueva.lot'.
 
- [9] [10
+
+[9] [10
 
 ]
 --------------------
@@ -1169,7 +1143,7 @@ l.21 U
 
 
 ]
-<./Figures/anomaly_example.png, id=357, 597.87pt x 249.003pt>
+<./Figures/anomaly_example.png, id=516, 597.87pt x 249.003pt>
 File: ./Figures/anomaly_example.png Graphic file (type png)
 <use ./Figures/anomaly_example.png>
 Package pdftex.def Info: ./Figures/anomaly_example.png  used on input line 27.
@@ -1330,8 +1304,8 @@ Overfull \hbox (12.61278pt too wide) in paragraph at lines 83--92
 LaTeX Info: Redefining \. on input line 97.
 LaTeX Info: Redefining \% on input line 97.
 [4])
-LaTeX Info: Redefining \. on input line 131.
-LaTeX Info: Redefining \% on input line 131.
+LaTeX Info: Redefining \. on input line 118.
+LaTeX Info: Redefining \% on input line 118.
  [5]
 \openout2 = `Chapters/Chapter2.aux'.
 
@@ -1343,234 +1317,374 @@ LaTeX Info: Redefining \% on input line 131.
 ]
 Cap\'{\i }tulo 2.
 
-Underfull \hbox (badness 10000) in paragraph at lines 31--32
+Underfull \hbox (badness 10000) in paragraph at lines 33--34
 []|\T1/ppl/m/n/10 Operaciones con arre-glos n-
  []
 
 
-Underfull \hbox (badness 1783) in paragraph at lines 31--32
+Underfull \hbox (badness 1783) in paragraph at lines 33--34
 \T1/ppl/m/n/10 dimensionales y cálcu-lo del error de
  []
 
 
-Underfull \hbox (badness 2237) in paragraph at lines 32--33
+Underfull \hbox (badness 2237) in paragraph at lines 34--35
 []|\T1/ppl/m/n/10 Manipulación de se-ries tem-po-ra-les y
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 35--35
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
 []|\T1/pcr/m/n/10 prometheus_
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
+Underfull \hbox (badness 10000) in paragraph at lines 41--41
 []|\T1/pcr/m/n/10 matplotlib \T1/ppl/m/n/10 /
  []
 
 [7]
-Overfull \hbox (26.18747pt too wide) in paragraph at lines 46--47
-\T1/ppl/m/n/10.95 to nu-mé-ri-co y apren-di-za-je pro-fun-do (\T1/pcr/m/n/10.95
- TensorFlow\T1/ppl/m/n/10.95 , \T1/pcr/m/n/10.95 NumPy\T1/ppl/m/n/10.95 , \T1/p
-cr/m/n/10.95 pandas\T1/ppl/m/n/10.95 , \T1/pcr/m/n/10.95 scikit-learn\T1/ppl/m/
-n/10.95 ),
- []
-
 LaTeX Info: Redefining \. on input line 58.
 LaTeX Info: Redefining \% on input line 58.
-[8]
-Underfull \hbox (badness 10000) in paragraph at lines 88--88
-[]|\T1/ppl/m/n/10 Cantidad apro-xi-ma-da de
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 90--91
-[]|\T1/pcr/m/n/10 hour_sin\T1/ppl/m/n/10 , \T1/pcr/m/n/10 hour_cos\T1/ppl/m/n/1
-0 , \T1/pcr/m/n/10 dayofweek_sin\T1/ppl/m/n/10 ,
- []
-
-<./Figures/dataset_distribution.png, id=440, 657.0pt x 401.0985pt>
-File: ./Figures/dataset_distribution.png Graphic file (type png)
-<use ./Figures/dataset_distribution.png>
-Package pdftex.def Info: ./Figures/dataset_distribution.png  used on input line
- 103.
-(pdftex.def)             Requested size: 358.61775pt x 218.94012pt.
-LaTeX Info: Redefining \. on input line 116.
-LaTeX Info: Redefining \% on input line 116.
-[9]
-LaTeX Info: Redefining \. on input line 116.
-LaTeX Info: Redefining \% on input line 116.
- [10 <./Figures/dataset_distribution.png>]
-<./Figures/infra_demo.png, id=464, 676.32675pt x 343.88475pt>
-File: ./Figures/infra_demo.png Graphic file (type png)
-<use ./Figures/infra_demo.png>
-Package pdftex.def Info: ./Figures/infra_demo.png  used on input line 134.
-(pdftex.def)             Requested size: 343.02826pt x 174.41866pt.
-LaTeX Info: Redefining \. on input line 140.
-LaTeX Info: Redefining \% on input line 140.
- [11]
-Underfull \hbox (badness 2875) in paragraph at lines 153--153
+ [8]
+LaTeX Info: Redefining \. on input line 80.
+LaTeX Info: Redefining \% on input line 80.
+ [9]
+Underfull \hbox (badness 2875) in paragraph at lines 99--99
 []|\T1/ppl/m/n/10 Orquestación de ser-vi-
  []
 
 
-Underfull \hbox (badness 4765) in paragraph at lines 158--158
+Underfull \hbox (badness 4765) in paragraph at lines 104--104
 []|\T1/ppl/m/n/10 Destino de des-plie-gue
  []
 
+LaTeX Info: Redefining \. on input line 113.
+LaTeX Info: Redefining \% on input line 113.
+[10]
+Underfull \hbox (badness 10000) in paragraph at lines 125--125
+[]|\T1/ppl/m/n/10 Error cua-drá-ti-co me-dio
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 131--131
+[]|\T1/ppl/m/n/10 Fracción de ano-ma-lías
+ []
+
+
+Underfull \hbox (badness 3281) in paragraph at lines 131--131
+\T1/ppl/m/n/10 reales co-rrec-ta-men-te de-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 135--135
+[]|\T1/ppl/m/n/10 Fracción de ven-ta-nas
+ []
+
 )
-LaTeX Info: Redefining \. on input line 132.
-LaTeX Info: Redefining \% on input line 132.
- [12 <./Figures/infra_demo.png>]
+LaTeX Info: Redefining \. on input line 119.
+LaTeX Info: Redefining \% on input line 119.
+ [11]
 \openout2 = `Chapters/Chapter3.aux'.
 
- (Chapters/Chapter3.tex
+ (Chapters/Chapter3.tex [12
+
+
+
+
+]
 Cap\'{\i }tulo 3.
-<./Figures/flow_diag.png, id=478, 791.95876pt x 848.16875pt>
-File: ./Figures/flow_diag.png Graphic file (type png)
-<use ./Figures/flow_diag.png>
-Package pdftex.def Info: ./Figures/flow_diag.png  used on input line 9.
-(pdftex.def)             Requested size: 370.31136pt x 396.59453pt.
-[13
 
+Underfull \hbox (badness 1924) in paragraph at lines 20--21
+[]\T1/ppl/m/n/10.95 Un clien-te de-di-ca-do (\T1/pcr/m/n/10.95 PrometheusClient
+\T1/ppl/m/n/10.95 ) lee las con-sul-tas de-fi-ni-das en
+ []
 
-
-
- <./Figures/flow_diag.png (PNG copy)>]
-Underfull \hbox (badness 10000) in paragraph at lines 58--59
+[13]
+Underfull \hbox (badness 10000) in paragraph at lines 49--50
 []|\T1/ppl/m/n/9 Demanda ins-tan-tá-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 59--60
+Underfull \hbox (badness 10000) in paragraph at lines 50--51
 []|\T1/ppl/m/n/9 Cola su-pe-rior de
  []
 
 
-Underfull \hbox (badness 1057) in paragraph at lines 60--61
+Underfull \hbox (badness 1057) in paragraph at lines 51--52
 []|\T1/ppl/m/n/9 Presión de me-mo-ria
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 61--62
+Underfull \hbox (badness 10000) in paragraph at lines 52--53
 []|\T1/ppl/m/n/9 Tasa de res-pues-tas
  []
 
 
-Overfull \hbox (0.89082pt too wide) in paragraph at lines 54--65
+Overfull \hbox (0.89082pt too wide) in paragraph at lines 45--56
  [][] 
  []
 
-LaTeX Info: Redefining \. on input line 65.
-LaTeX Info: Redefining \% on input line 65.
+LaTeX Info: Redefining \. on input line 69.
+LaTeX Info: Redefining \% on input line 69.
 [14]
-LaTeX Info: Redefining \. on input line 85.
-LaTeX Info: Redefining \% on input line 85.
+LaTeX Info: Redefining \. on input line 108.
+LaTeX Info: Redefining \% on input line 108.
  [15]
-LaTeX Info: Redefining \. on input line 122.
-LaTeX Info: Redefining \% on input line 122.
+<./Figures/sliding_window.png, id=646, 563.10374pt x 361.04887pt>
+File: ./Figures/sliding_window.png Graphic file (type png)
+<use ./Figures/sliding_window.png>
+Package pdftex.def Info: ./Figures/sliding_window.png  used on input line 129.
+(pdftex.def)             Requested size: 358.61775pt x 229.9356pt.
+LaTeX Info: Redefining \. on input line 156.
+LaTeX Info: Redefining \% on input line 156.
  [16]
-LaTeX Info: Redefining \. on input line 177.
-LaTeX Info: Redefining \% on input line 177.
- [17]
-LaTeX Info: Redefining \. on input line 208.
-LaTeX Info: Redefining \% on input line 208.
- [18]
-Underfull \hbox (badness 1043) in paragraph at lines 238--238
+LaTeX Info: Redefining \. on input line 186.
+LaTeX Info: Redefining \% on input line 186.
+ [17 <./Figures/sliding_window.png>]
+<./Figures/infra_demo.png, id=661, 676.32675pt x 343.88475pt>
+File: ./Figures/infra_demo.png Graphic file (type png)
+<use ./Figures/infra_demo.png>
+Package pdftex.def Info: ./Figures/infra_demo.png  used on input line 217.
+(pdftex.def)             Requested size: 350.82004pt x 178.38033pt.
+LaTeX Info: Redefining \. on input line 225.
+LaTeX Info: Redefining \% on input line 225.
+ [18 <./Figures/infra_demo.png>]
+Underfull \hbox (badness 1043) in paragraph at lines 246--246
 []|\T1/ppl/m/n/10 LSTM de-co-di-fi-ca-dor
  []
 
-LaTeX Info: Redefining \. on input line 243.
-LaTeX Info: Redefining \% on input line 243.
+LaTeX Info: Redefining \. on input line 285.
+LaTeX Info: Redefining \% on input line 285.
 [19]
-LaTeX Info: Redefining \. on input line 282.
-LaTeX Info: Redefining \% on input line 282.
+LaTeX Info: Redefining \. on input line 318.
+LaTeX Info: Redefining \% on input line 318.
  [20]
-LaTeX Info: Redefining \. on input line 316.
-LaTeX Info: Redefining \% on input line 316.
- [21]
-LaTeX Info: Redefining \. on input line 356.
-LaTeX Info: Redefining \% on input line 356.
- [22]
-LaTeX Info: Redefining \. on input line 395.
-LaTeX Info: Redefining \% on input line 395.
+Underfull \hbox (badness 10000) in paragraph at lines 355--355
+[]|\T1/ppl/m/n/10 Cantidad apro-xi-ma-da de
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 357--358
+[]|\T1/pcr/m/n/10 hour_sin\T1/ppl/m/n/10 , \T1/pcr/m/n/10 hour_cos\T1/ppl/m/n/1
+0 , \T1/pcr/m/n/10 dayofweek_sin\T1/ppl/m/n/10 ,
+ []
+
+<./Figures/dataset_distribution.png, id=691, 657.0pt x 401.0985pt>
+File: ./Figures/dataset_distribution.png Graphic file (type png)
+<use ./Figures/dataset_distribution.png>
+Package pdftex.def Info: ./Figures/dataset_distribution.png  used on input line
+ 370.
+(pdftex.def)             Requested size: 358.61775pt x 218.94012pt.
+LaTeX Info: Redefining \. on input line 379.
+LaTeX Info: Redefining \% on input line 379.
+[21]
+LaTeX Info: Redefining \. on input line 379.
+LaTeX Info: Redefining \% on input line 379.
+ [22 <./Figures/dataset_distribution.png>]
+LaTeX Info: Redefining \. on input line 418.
+LaTeX Info: Redefining \% on input line 418.
  [23]
-Underfull \hbox (badness 10000) in paragraph at lines 400--400
- []\T1/ppl/m/sc/10 Tabla 3.11. |\T1/ppl/m/n/10 Ex-plo-ra-ción de con-fi-gu-ra-c
+Underfull \hbox (badness 1199) in paragraph at lines 451--452
+[]\T1/ppl/m/n/10.95 Se reali-zó una bús-que-da aco-ta-da de con-fi-gu-ra-cio-ne
+s al-ter-na-ti-vas me-dian-te
+ []
+
+LaTeX Info: Redefining \. on input line 456.
+LaTeX Info: Redefining \% on input line 456.
+[24]
+Underfull \hbox (badness 10000) in paragraph at lines 460--460
+ []\T1/ppl/m/sc/10 Tabla 3.12. |\T1/ppl/m/n/10 Ex-plo-ra-ción de con-fi-gu-ra-c
 io-nes al-ter-na-ti-vas 
  []
 
 
-Overfull \hbox (0.64284pt too wide) in paragraph at lines 407--407
+Overfull \hbox (0.64284pt too wide) in paragraph at lines 467--467
 []|\T1/pcr/m/n/9 small_bottleneck| 
  []
 
-LaTeX Info: Redefining \. on input line 436.
-LaTeX Info: Redefining \% on input line 436.
-[24]
-LaTeX Info: Redefining \. on input line 471.
-LaTeX Info: Redefining \% on input line 471.
- [25]
-Underfull \hbox (badness 10000) in paragraph at lines 479--480
+LaTeX Info: Redefining \. on input line 500.
+LaTeX Info: Redefining \% on input line 500.
+[25]
+Underfull \hbox (badness 10000) in paragraph at lines 537--538
 []\T1/ppl/m/n/10.95 El ge-ne-ra-dor \T1/pcr/m/n/10.95 GrafanaLinkGenerator \T1/
 ppl/m/n/10.95 cons-tru-yó URLs al \T1/ppl/m/it/10.95 dash-board
  []
 
-LaTeX Info: Redefining \. on input line 509.
-LaTeX Info: Redefining \% on input line 509.
+LaTeX Info: Redefining \. on input line 538.
+LaTeX Info: Redefining \% on input line 538.
 [26]
-Underfull \hbox (badness 2635) in paragraph at lines 519--520
+Underfull \hbox (badness 2635) in paragraph at lines 577--578
 []|\T1/ppl/m/n/10 Instancia cor-po-ra-ti-va in-
  []
 
 
-Underfull \hbox (badness 3000) in paragraph at lines 521--521
+Underfull \hbox (badness 3000) in paragraph at lines 579--579
 []|\T1/ppl/m/n/10 Grafana / Pro-metheus
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 524--525
+Underfull \hbox (badness 10000) in paragraph at lines 582--582
+[]|\T1/ppl/m/n/10 Volumen mon-ta-do
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 582--583
 []|\T1/ppl/m/n/10 Montaje equi-va-len-te en
  []
 
-LaTeX Info: Redefining \. on input line 547.
-LaTeX Info: Redefining \% on input line 547.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+LaTeX Info: Redefining \. on input line 591.
+LaTeX Info: Redefining \% on input line 591.
 [27])
-LaTeX Info: Redefining \. on input line 133.
-LaTeX Info: Redefining \% on input line 133.
+LaTeX Info: Redefining \. on input line 120.
+LaTeX Info: Redefining \% on input line 120.
  [28]
 \openout2 = `Chapters/Chapter4.aux'.
 
  (Chapters/Chapter4.tex
 Cap\'{\i }tulo 4.
-) [29
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[29
 
 
 
 
 ]
+LaTeX Info: Redefining \. on input line 64.
+LaTeX Info: Redefining \% on input line 64.
+ [30]
+<./Figures/evaluacion_modelo.png, id=774, 860.013pt x 642.4803pt>
+File: ./Figures/evaluacion_modelo.png Graphic file (type png)
+<use ./Figures/evaluacion_modelo.png>
+Package pdftex.def Info: ./Figures/evaluacion_modelo.png  used on input line 69
+.
+(pdftex.def)             Requested size: 370.31136pt x 276.64348pt.
+<./Figures/reconstruccion_ejemplo.png, id=776, 860.013pt x 323.40825pt>
+File: ./Figures/reconstruccion_ejemplo.png Graphic file (type png)
+<use ./Figures/reconstruccion_ejemplo.png>
+Package pdftex.def Info: ./Figures/reconstruccion_ejemplo.png  used on input li
+ne 80.
+(pdftex.def)             Requested size: 370.31136pt x 139.25528pt.
+LaTeX Info: Redefining \. on input line 83.
+LaTeX Info: Redefining \% on input line 83.
+ [31 <./Figures/evaluacion_modelo.png>]
+LaTeX Info: Redefining \. on input line 112.
+LaTeX Info: Redefining \% on input line 112.
+ [32 <./Figures/reconstruccion_ejemplo.png>]
+<./Figures/barrido_umbral.png, id=792, 499.3857pt x 339.30765pt>
+File: ./Figures/barrido_umbral.png Graphic file (type png)
+<use ./Figures/barrido_umbral.png>
+Package pdftex.def Info: ./Figures/barrido_umbral.png  used on input line 133.
+(pdftex.def)             Requested size: 311.84334pt x 211.88554pt.
+LaTeX Info: Redefining \. on input line 158.
+LaTeX Info: Redefining \% on input line 158.
+ [33 <./Figures/barrido_umbral.png>]
+LaTeX Info: Redefining \. on input line 191.
+LaTeX Info: Redefining \% on input line 191.
+ [34]
+LaTeX Info: Redefining \. on input line 225.
+LaTeX Info: Redefining \% on input line 225.
+ [35]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+LaTeX Info: Redefining \. on input line 268.
+LaTeX Info: Redefining \% on input line 268.
+[36]
+<./Figures/demo_grafana.png, id=825, 1927.2pt x 1084.05pt>
+File: ./Figures/demo_grafana.png Graphic file (type png)
+<use ./Figures/demo_grafana.png>
+Package pdftex.def Info: ./Figures/demo_grafana.png  used on input line 279.
+(pdftex.def)             Requested size: 389.80269pt x 219.25426pt.
+<./Figures/demo_logs.png, id=827, 837.24796pt x 266.31496pt>
+File: ./Figures/demo_logs.png Graphic file (type png)
+<use ./Figures/demo_logs.png>
+Package pdftex.def Info: ./Figures/demo_logs.png  used on input line 288.
+(pdftex.def)             Requested size: 389.80269pt x 123.99364pt.
+LaTeX Info: Redefining \. on input line 294.
+LaTeX Info: Redefining \% on input line 294.
+ [37]
+LaTeX Info: Redefining \. on input line 294.
+LaTeX Info: Redefining \% on input line 294.
+ [38 <./Figures/demo_grafana.png (PNG copy)> <./Figures/demo_logs.png>]
+<./Figures/demo_jsm_alerta.png, id=838, 450.18187pt x 718.93594pt>
+File: ./Figures/demo_jsm_alerta.png Graphic file (type png)
+<use ./Figures/demo_jsm_alerta.png>
+Package pdftex.def Info: ./Figures/demo_jsm_alerta.png  used on input line 299.
+
+(pdftex.def)             Requested size: 187.10362pt x 298.80263pt.
+<./Figures/demo_jsm_escalacion.png, id=839, 441.90094pt x 717.43031pt>
+File: ./Figures/demo_jsm_escalacion.png Graphic file (type png)
+<use ./Figures/demo_jsm_escalacion.png>
+Package pdftex.def Info: ./Figures/demo_jsm_escalacion.png  used on input line 
+304.
+(pdftex.def)             Requested size: 187.10362pt x 303.77083pt.
+<./Figures/ciclo_vida_alerta.png, id=843, 1040.32664pt x 339.669pt>
+File: ./Figures/ciclo_vida_alerta.png Graphic file (type png)
+<use ./Figures/ciclo_vida_alerta.png>
+Package pdftex.def Info: ./Figures/ciclo_vida_alerta.png  used on input line 31
+7.
+(pdftex.def)             Requested size: 389.80269pt x 127.2719pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+LaTeX Info: Redefining \. on input line 341.
+LaTeX Info: Redefining \% on input line 341.
+[39 <./Figures/demo_jsm_alerta.png> <./Figures/demo_jsm_escalacion.png>])
+LaTeX Info: Redefining \. on input line 121.
+LaTeX Info: Redefining \% on input line 121.
+
+[40 <./Figures/ciclo_vida_alerta.png>]
 \openout2 = `Chapters/Chapter5.aux'.
 
- (Chapters/Chapter5.tex [30
-
-
-
-
-]
+ (Chapters/Chapter5.tex
 Cap\'{\i }tulo 5.
-) [31] [32
+) [41
+
+
+
+
+] [42
 
 
 
 ]
-Overfull \hbox (9.54956pt too wide) in paragraph at lines 153--153
+Overfull \hbox (0.85327pt too wide) in paragraph at lines 140--140
+\T1/ppl/m/n/10.95 Pi-sa, Italy: IEEE Com-pu-ter So-ciety, 2008, págs. 413[]422.
+ \T1/ppl/m/sc/10.95 doi\T1/ppl/m/n/10.95 : [][]$10 . 1109 / ICDM .
+ []
+
+
+Overfull \hbox (9.54956pt too wide) in paragraph at lines 140--140
 \T1/ppl/m/it/10.95 analy-tics, in-ter-ac-ti-ve dash-boards, and mo-ni-to-ring\T
 1/ppl/m/n/10.95 . Bir-mingham: Packt Pu-blishing,
  []
 
-[33]
-LaTeX Info: Redefining \. on input line 155.
-LaTeX Info: Redefining \% on input line 155.
- [34] (memorianueva.aux (portada.aux)
+
+Overfull \hbox (0.40674pt too wide) in paragraph at lines 140--140
+[]\T1/ppl/m/n/10.95 Atlassian. \T1/ppl/m/it/10.95 Ops-ge-nie: Mo-dern in-ci-den
+t ma-na-ge-ment and res-pon-se\T1/ppl/m/n/10.95 . [][]$https : / / www .
+ []
+
+
+Overfull \hbox (4.70015pt too wide) in paragraph at lines 140--140
+[]\T1/ppl/m/n/10.95 John D. Hun-ter et al. \T1/ppl/m/it/10.95 Mat-plotlib: Vi-s
+ua-li-za-tion with Python\T1/ppl/m/n/10.95 . [][]$https : / / matplotlib .
+ []
+
+[43]
+Overfull \hbox (16.36856pt too wide) in paragraph at lines 140--140
+[]\T1/ppl/m/n/10.95 Numenta. \T1/ppl/m/it/10.95 Nu-men-ta Ano-maly Bench-mark (
+NAB)\T1/ppl/m/n/10.95 . [][]$https : / / github . com / numenta /
+ []
+
+LaTeX Info: Redefining \. on input line 142.
+LaTeX Info: Redefining \% on input line 142.
+[44] (memorianueva.aux (portada.aux)
 LaTeX Info: Redefining \sptext on input line 16.
 LaTeX Info: Redefining \. on input line 16.
 LaTeX Info: Redefining \% on input line 16.
@@ -1579,14 +1693,14 @@ LaTeX Info: Redefining \% on input line 16.
 (Chapters/Chapter5.aux))
  ***********
 LaTeX2e <2025-11-01>
-L3 programming layer <2020/03/25>
+L3 programming layer <2025-12-24>
  ***********
 
 
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `memorianueva.out' has not changed.
-(rerunfilecheck)             Checksum: F14D4B6F7D4B559B5BD2A72831434C05;8786.
+(rerunfilecheck)             Checksum: 4940EA5442CA664C270A07F8E84C736D;13883.
 
 Package biblatex Warning: Please (re)run BibTeX on the file(s):
 (biblatex)                memorianueva
@@ -1597,13 +1711,13 @@ Package logreq Info: Writing requests to 'memorianueva.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 32699 strings out of 467871
- 709828 string characters out of 5418377
- 1356314 words of memory out of 5000000
- 60994 multiletter control sequences out of 15000+600000
+ 32246 strings out of 467871
+ 698828 string characters out of 5418377
+ 1311232 words of memory out of 5000000
+ 60508 multiletter control sequences out of 15000+600000
  693220 words of font info for 124 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 96i,21n,95p,1971b,2993s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 96i,21n,95p,1971b,2968s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmex10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmmi10.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -1626,9 +1740,9 @@ e1/urw/palatino/uplb8a.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fonts/
 type1/urw/palatino/uplr8a.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/fon
 ts/type1/urw/palatino/uplr8a.pfb><C:/Users/chris/AppData/Local/Programs/MiKTeX/
 fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on memorianueva.pdf (48 pages, 839316 bytes).
+Output written on memorianueva.pdf (58 pages, 1909096 bytes).
 PDF statistics:
- 782 PDF objects out of 1000 (max. 8388607)
- 176 named destinations out of 1000 (max. 500000)
- 362 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1034 PDF objects out of 1200 (max. 8388607)
+ 225 named destinations out of 1000 (max. 500000)
+ 586 words of extra memory for PDF output out of 10000 (max. 10000000)
 
