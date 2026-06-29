@@ -58,6 +58,8 @@ El procedimiento se automatizó en el script \path{scripts/evaluate\_model.py}, 
 \section{Evaluación del modelo}
 \label{sec:evaluacion-modelo}
 
+Los resultados del entrenamiento y del conjunto de prueba con anomalías inyectadas se organizan en torno a dos ejes: la calidad de reconstrucción sobre tramos nominales y la capacidad de clasificación binaria con el umbral calibrado. A continuación se reportan ambos planos, el contraste visual entre ventanas nominales y anómalas, la sensibilidad al umbral, la comparación con una línea base de umbrales fijos y la latencia de detección por tipo de perturbación.
+
 \subsection{Calidad de reconstrucción}
 
 El entrenamiento convergió de forma estable. La pérdida de entrenamiento descendió hasta el orden de $1{,}4\times10^{-3}$ y la pérdida de validación se estabilizó en torno a $3\times10^{-4}$ en la escala normalizada, sin signos de sobreajuste tras la activación de la parada temprana. Sobre los tramos nominales del conjunto de prueba, el error de reconstrucción se concentró en valores bajos: el percentil 95 quedó cerca de $6\times10^{-4}$ y el percentil 99 cerca de $1{,}7\times10^{-3}$, por debajo del umbral calibrado de $0{,}0025$. Las ventanas anómalas, en cambio, alcanzaron errores de hasta dos órdenes de magnitud mayores. Ese margen entre el error típico del régimen nominal y el umbral es el que sostiene una baja tasa de falsas alertas sobre comportamiento habitual.
@@ -86,12 +88,12 @@ Para ilustrar el mecanismo de detección, la figura~\ref{fig:reconstruccion} com
 
 El conjunto de prueba comprendió 2861~ventanas, de las que 267 (un 9,3~\%) resultaron anómalas por contener al menos un instante inyectado. Con el umbral desplegado de $0{,}0025$, correspondiente al percentil 99,5 de los errores de validación, el detector clasificó correctamente 262 de las 267~ventanas anómalas y solo marcó 16 de las 2594~ventanas nominales como anómalas. La tabla~\ref{tab:metricas-resultado} reporta las métricas resultantes y la matriz de confusión se incluye en el panel inferior izquierdo de la figura~\ref{fig:eval-modelo}.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \small
 \caption{Métricas de clasificación con el umbral desplegado (percentil 99,5 de validación).}
 \label{tab:metricas-resultado}
-\begin{tabular}{@{}p{0.42\textwidth}p{0.28\textwidth}@{}}
+\begin{tabular}{@{}l@{\hspace{3em}}r@{}}
 \toprule
 \textbf{Métrica} & \textbf{Valor} \\
 \midrule

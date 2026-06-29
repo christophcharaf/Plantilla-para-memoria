@@ -4,7 +4,7 @@
 \contentsline {section}{\numberline {1.1}Servicios de TV-over-IP y desafíos operativos}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Contexto y motivación}{2}{section.1.2}%
 \contentsline {section}{\numberline {1.3}Estado del arte}{3}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Objetivos del trabajo}{4}{section.1.4}%
+\contentsline {section}{\numberline {1.4}Objetivos del trabajo}{5}{section.1.4}%
 \contentsline {chapter}{\numberline {2}Introducción específica}{7}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Frameworks y bibliotecas de IA/ML}{7}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Datasets y datos de entrenamiento}{8}{section.2.2}%
@@ -18,16 +18,16 @@
 \contentsline {subsection}{\numberline {3.1.1}Recolección y alineación temporal}{13}{subsection.3.1.1}%
 \contentsline {subsection}{\numberline {3.1.2}Ingeniería de variables y normalización}{15}{subsection.3.1.2}%
 \contentsline {subsection}{\numberline {3.1.3}Construcción de ventanas deslizantes}{16}{subsection.3.1.3}%
-\contentsline {subsection}{\numberline {3.1.4}Organización del código fuente}{17}{subsection.3.1.4}%
+\contentsline {subsection}{\numberline {3.1.4}Organización del código fuente}{16}{subsection.3.1.4}%
 \contentsline {subsection}{\numberline {3.1.5}Paridad entre entrenamiento e inferencia}{17}{subsection.3.1.5}%
 \contentsline {section}{\numberline {3.2}Arquitectura del sistema}{18}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Codificador y decodificador}{19}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.1}Codificador y decodificador}{18}{subsection.3.2.1}%
 \contentsline {subsection}{\numberline {3.2.2}Función de pérdida y señal de anomalía}{19}{subsection.3.2.2}%
 \contentsline {subsection}{\numberline {3.2.3}Acoplamiento multivariado y espacio latente}{20}{subsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.2.4}Decisiones de diseño arquitectónico}{20}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.4}Decisiones de diseño arquitectónico}{21}{subsection.3.2.4}%
 \contentsline {section}{\numberline {3.3}Entrenamiento, evaluación y optimización}{21}{section.3.3}%
 \contentsline {subsection}{\numberline {3.3.1}Características del dataset}{21}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Procedimiento de entrenamiento}{23}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.2}Procedimiento de entrenamiento}{22}{subsection.3.3.2}%
 \contentsline {subsection}{\numberline {3.3.3}Calibración del umbral}{24}{subsection.3.3.3}%
 \contentsline {subsection}{\numberline {3.3.4}Exploración de hiperparámetros}{24}{subsection.3.3.4}%
 \contentsline {section}{\numberline {3.4}Integración e implementación del sistema}{25}{section.3.4}%
@@ -35,32 +35,32 @@
 \contentsline {subsection}{\numberline {3.4.2}Gestión de alertas y deduplicación}{26}{subsection.3.4.2}%
 \contentsline {subsection}{\numberline {3.4.3}Enlaces contextuales a Grafana}{27}{subsection.3.4.3}%
 \contentsline {subsection}{\numberline {3.4.4}Despliegue y configuración}{27}{subsection.3.4.4}%
-\contentsline {subsection}{\numberline {3.4.5}Registro, trazabilidad y requisitos no funcionales}{27}{subsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.4.5}Registro, trazabilidad y requisitos no funcionales}{28}{subsection.3.4.5}%
 \contentsline {subsection}{\numberline {3.4.6}Flujo operativo en producción}{28}{subsection.3.4.6}%
-\contentsline {chapter}{\numberline {4}Ensayos y resultados}{29}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Plan de evaluación}{29}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Conjuntos de datos y partición}{29}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Confidencialidad de los resultados}{30}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Métricas y condiciones de prueba}{30}{subsection.4.1.3}%
-\contentsline {section}{\numberline {4.2}Evaluación del modelo}{30}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Calidad de reconstrucción}{30}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Reconstrucción de ventanas nominales y anómalas}{31}{subsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.2.3}Desempeño de clasificación}{32}{subsection.4.2.3}%
-\contentsline {subsection}{\numberline {4.2.4}Sensibilidad al umbral}{32}{subsection.4.2.4}%
-\contentsline {subsection}{\numberline {4.2.5}Comparación con una línea base de umbrales fijos}{33}{subsection.4.2.5}%
-\contentsline {subsection}{\numberline {4.2.6}Latencia de detección}{34}{subsection.4.2.6}%
-\contentsline {section}{\numberline {4.3}Análisis de errores}{34}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Falsos negativos}{34}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}Falsos positivos}{35}{subsection.4.3.2}%
-\contentsline {subsection}{\numberline {4.3.3}Contribución de cada variable al error}{35}{subsection.4.3.3}%
-\contentsline {subsection}{\numberline {4.3.4}Errores observados en el despliegue real}{36}{subsection.4.3.4}%
-\contentsline {section}{\numberline {4.4}Ensayos de integración del sistema}{36}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}Detección extremo a extremo}{36}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}Canal de alertas intercambiable}{37}{subsection.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.3}Demostración en el entorno demostrativo}{37}{subsection.4.4.3}%
-\contentsline {subsection}{\numberline {4.4.4}Deduplicación de alertas}{39}{subsection.4.4.4}%
-\contentsline {subsection}{\numberline {4.4.5}Costo de inferencia y robustez}{40}{subsection.4.4.5}%
-\contentsline {chapter}{\numberline {5}Conclusiones}{41}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Conclusiones generales }{41}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Próximos pasos}{41}{section.5.2}%
-\contentsline {chapter}{Bibliografía}{43}{appendix*.46}%
+\contentsline {chapter}{\numberline {4}Ensayos y resultados}{31}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Plan de evaluación}{31}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Conjuntos de datos y partición}{31}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Confidencialidad de los resultados}{32}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Métricas y condiciones de prueba}{32}{subsection.4.1.3}%
+\contentsline {section}{\numberline {4.2}Evaluación del modelo}{32}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Calidad de reconstrucción}{33}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Reconstrucción de ventanas nominales y anómalas}{33}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Desempeño de clasificación}{34}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Sensibilidad al umbral}{35}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Comparación con una línea base de umbrales fijos}{35}{subsection.4.2.5}%
+\contentsline {subsection}{\numberline {4.2.6}Latencia de detección}{36}{subsection.4.2.6}%
+\contentsline {section}{\numberline {4.3}Análisis de errores}{36}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Falsos negativos}{37}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Falsos positivos}{37}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Contribución de cada variable al error}{37}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Errores observados en el despliegue real}{38}{subsection.4.3.4}%
+\contentsline {section}{\numberline {4.4}Ensayos de integración del sistema}{38}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Detección extremo a extremo}{39}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Canal de alertas intercambiable}{39}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Demostración en el entorno demostrativo}{39}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Deduplicación de alertas}{42}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}Costo de inferencia y robustez}{42}{subsection.4.4.5}%
+\contentsline {chapter}{\numberline {5}Conclusiones}{43}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Conclusiones generales }{43}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Próximos pasos}{43}{section.5.2}%
+\contentsline {chapter}{Bibliografía}{45}{appendix*.46}%

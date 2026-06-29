@@ -4,14 +4,14 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Estructura lógica de ventanas deslizantes.}}{17}{figure.caption.15}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Estructura del sistema de detección.}}{18}{figure.caption.19}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}}{22}{figure.caption.24}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Estructura del sistema de detección.}}{19}{figure.caption.19}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}}{23}{figure.caption.24}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Evaluación del modelo sobre el conjunto de prueba con anomalías inyectadas: distribución del error, línea de tiempo de detección, matriz de confusión y métricas.}}{31}{figure.caption.31}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Señal observada (línea continua) y reconstruida (línea discontinua) para una ventana nominal y una ventana anómala. El eje vertical está en la escala normalizada de entrada al modelo.}}{32}{figure.caption.32}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Variación de precisión, sensibilidad, F1-score y tasa de falsos positivos según el percentil del error en ventanas nominales adoptado como umbral.}}{33}{figure.caption.35}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Panel de Grafana durante la demostración en vivo: pico sostenido de latencia percentil 95 con el resto de métricas nominales.}}{38}{figure.caption.40}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Extracto de registros del detector durante la demostración: apertura, deduplicación, escalamiento y resolución.}}{38}{figure.caption.41}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Alertas en Jira Service Management Operations durante la demostración en vivo: apertura con contexto de detección y escalamiento por persistencia.}}{39}{figure.caption.42}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Ciclo de vida de una alerta: transiciones entre operación nominal, confirmación, deduplicación, escalamiento y resolución.}}{40}{figure.caption.43}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Evaluación del modelo sobre el conjunto de prueba con anomalías inyectadas: distribución del error, línea de tiempo de detección, matriz de confusión y métricas.}}{33}{figure.caption.31}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Señal observada (línea continua) y reconstruida (línea discontinua) para una ventana nominal y una ventana anómala. El eje vertical está en la escala normalizada de entrada al modelo.}}{34}{figure.caption.32}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Variación de precisión, sensibilidad, F1-score y tasa de falsos positivos según el percentil del error en ventanas nominales adoptado como umbral.}}{35}{figure.caption.35}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Panel de Grafana durante la demostración en vivo: pico sostenido de latencia percentil 95 con el resto de métricas nominales.}}{40}{figure.caption.40}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Extracto de registros del detector durante la demostración: apertura, deduplicación, escalamiento y resolución.}}{40}{figure.caption.41}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Alertas en Jira Service Management Operations durante la demostración en vivo: apertura con contexto de detección y escalamiento por persistencia.}}{41}{figure.caption.42}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Ciclo de vida de una alerta: transiciones entre operación nominal, confirmación, deduplicación, escalamiento y resolución.}}{42}{figure.caption.43}%
 \addvspace {10\p@ }

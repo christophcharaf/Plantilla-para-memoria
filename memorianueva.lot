@@ -9,8 +9,8 @@
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {3.1}{\ignorespaces Consultas PromQL y agregación por métrica del servicio.}}{14}{table.caption.13}%
 \contentsline {table}{\numberline {3.2}{\ignorespaces Cotas de normalización \texttt {fixed\_minmax} por variable.}}{15}{table.caption.14}%
-\contentsline {table}{\numberline {3.3}{\ignorespaces Etapas del pipeline de datos y artefactos producidos.}}{16}{table.caption.16}%
-\contentsline {table}{\numberline {3.4}{\ignorespaces Módulos implementados y responsabilidad funcional.}}{17}{table.caption.17}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Etapas del pipeline de datos y artefactos producidos.}}{17}{table.caption.16}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Módulos implementados y responsabilidad funcional.}}{18}{table.caption.17}%
 \contentsline {table}{\numberline {3.5}{\ignorespaces Paridad y diferencias deliberadas entre entrenamiento e inferencia.}}{18}{table.caption.18}%
 \contentsline {table}{\numberline {3.6}{\ignorespaces Capas del autoencoder LSTM y formas intermedias ($B$ = tamaño de lote).}}{19}{table.caption.20}%
 \contentsline {table}{\numberline {3.7}{\ignorespaces Asignación de prioridad Opsgenie según confianza de la anomalía.}}{20}{table.caption.21}%
@@ -22,12 +22,12 @@
 \contentsline {table}{\numberline {3.13}{\ignorespaces Archivos de configuración YAML del sistema.}}{27}{table.caption.28}%
 \contentsline {table}{\numberline {3.14}{\ignorespaces Comparación entre entorno demo y despliegue productivo.}}{28}{table.caption.29}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Anomalías inyectadas en el conjunto de prueba de 24~horas.}}{30}{table.caption.30}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Métricas de clasificación con el umbral desplegado (percentil 99,5 de validación).}}{32}{table.caption.33}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Barrido del umbral sobre percentiles del error en ventanas nominales.}}{33}{table.caption.34}%
-\contentsline {table}{\numberline {4.4}{\ignorespaces Comparación entre la línea base de umbrales fijos y el autoencoder LSTM.}}{33}{table.caption.36}%
-\contentsline {table}{\numberline {4.5}{\ignorespaces Latencia de detección por tipo de anomalía inyectada.}}{34}{table.caption.37}%
-\contentsline {table}{\numberline {4.6}{\ignorespaces Error de reconstrucción por variable técnica: mediana en ventanas nominales y media en ventanas anómalas.}}{35}{table.caption.38}%
-\contentsline {table}{\numberline {4.7}{\ignorespaces Escenarios de integración ejercitados en el entorno demostrativo.}}{37}{table.caption.39}%
-\contentsline {table}{\numberline {4.8}{\ignorespaces Efecto de la deduplicación sobre un incidente sostenido.}}{40}{table.caption.44}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Anomalías inyectadas en el conjunto de prueba de 24~horas.}}{32}{table.caption.30}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Métricas de clasificación con el umbral desplegado (percentil 99,5 de validación).}}{34}{table.caption.33}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Barrido del umbral sobre percentiles del error en ventanas nominales.}}{35}{table.caption.34}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Comparación entre la línea base de umbrales fijos y el autoencoder LSTM.}}{36}{table.caption.36}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Latencia de detección por tipo de anomalía inyectada.}}{36}{table.caption.37}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Error de reconstrucción por variable técnica: mediana en ventanas nominales y media en ventanas anómalas.}}{38}{table.caption.38}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Escenarios de integración ejercitados en el entorno demostrativo.}}{39}{table.caption.39}%
+\contentsline {table}{\numberline {4.8}{\ignorespaces Efecto de la deduplicación sobre un incidente sostenido.}}{42}{table.caption.44}%
 \addvspace {10\p@ }

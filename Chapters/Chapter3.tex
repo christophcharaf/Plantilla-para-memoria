@@ -452,25 +452,27 @@ Se realizó una búsqueda acotada de configuraciones alternativas mediante \path
 
 Los escenarios evaluados incluyeron bottleneck reducido ([32, 16, 8]), bottleneck ampliado ([128, 64, 32]), dropout 0,2 y ventanas de 30 pasos (15~minutos).
 
-Los criterios de selección combinaron la pérdida de validación, el margen entre error medio en datos nominales y el umbral propuesto, y la tasa de falsos positivos sobre ventanas sintéticas con anomalías inyectadas. La configuración base (ventana 20, capas 64--32--16, dropout 0,1, stride 1, \texttt{fixed\_minmax}) permaneció como referencia por ofrecer el mejor compromiso entre simplicidad de despliegue y desempeño en Prometheus. La tabla~\ref{tab:tuning-candidatos} resume los candidatos evaluados.
+Los criterios de selección combinaron la pérdida de validación, el margen entre error medio en datos nominales y el umbral propuesto, y la tasa de falsos positivos sobre ventanas sintéticas con anomalías inyectadas. La tabla~\ref{tab:tuning-candidatos} resume los candidatos evaluados; a continuación se comentan los resultados de cada variante.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
-\footnotesize
+\small
 \caption{Exploración de configuraciones alternativas (\texttt{tune\_model.py}).}
 \label{tab:tuning-candidatos}
-\begin{tabular}{@{}p{0.22\textwidth}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.34\textwidth}@{}}
+\begin{tabular}{@{}p{0.28\textwidth}p{0.58\textwidth}@{}}
 \toprule
-\textbf{Candidato} & \textbf{Variante} & \textbf{Observación} \\
+\textbf{Candidato} & \textbf{Variante} \\
 \midrule
-\texttt{baseline} & 64--32--16, ventana 20 & Mejor equilibrio validación / inferencia en Prometheus \\
-\texttt{small\_bottleneck} & 32--16--8 & Menor capacidad; tendencia a subestimar variaciones legítimas \\
-\texttt{wide\_bottleneck} & 128--64--32 & Mayor costo en CPU; ganancia marginal en validación \\
-\texttt{window\_30} & 30 pasos (15~min) & Mayor inercia; retrasa detección de incidentes breves \\
-\texttt{dropout\_02} & Dropout 0,2 & Subajuste; pérdida de validación más alta \\
+\texttt{baseline} & 64--32--16, ventana 20 \\
+\texttt{small\_bottleneck} & 32--16--8 \\
+\texttt{wide\_bottleneck} & 128--64--32 \\
+\texttt{window\_30} & 30 pasos (15~min) \\
+\texttt{dropout\_02} & Dropout 0,2 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+La configuración \texttt{baseline} (ventana 20, capas 64--32--16, dropout 0,1, stride 1, \texttt{fixed\_minmax}) ofreció el mejor equilibrio entre validación e inferencia en Prometheus y se mantuvo como referencia productiva por combinar simplicidad de despliegue y desempeño estable. La variante \texttt{small\_bottleneck} redujo la capacidad del codificador y tendió a subestimar variaciones legítimas del régimen nominal. \texttt{wide\_bottleneck} incrementó el costo de CPU con una ganancia marginal en la pérdida de validación. Con \texttt{window\_30}, la ventana más larga introdujo mayor inercia y retrasó la detección de incidentes breves. Por último, \texttt{dropout\_02} produjo subajuste y una pérdida de validación más elevada.
 
 Dos decisiones de preprocesamiento resultaron determinantes y se documentaron explícitamente por su impacto en la tasa de falsos positivos:
 
@@ -542,9 +544,11 @@ El operador que recibió la alerta en Opsgenie accedió con un clic a la misma v
 
 En el perfil \texttt{dev} de Docker Compose, el detector comparte red puente con un servicio simulado, Prometheus y Grafana. En producción, el contenedor de detección se integró a la red interna existente, consultó directamente la instancia Prometheus corporativa y emitió alertas hacia Opsgenie, sin exponer puertos hacia internet ni depender de servicios analíticos externos.
 
+El contenedor se construyó con un \path{Dockerfile} multi-etapa mínimo: instalación de dependencias Python desde \path{requirements.txt}, copia del código fuente y arranque de \path{inference.py} con usuario sin privilegios. Los directorios \path{models/}, \path{config/} y \path{logs/} se montaron como volúmenes para permitir actualizar pesos y umbrales sin reconstruir la imagen. Los límites de recursos (1 CPU virtual y 2~GB de RAM) resultaron suficientes para el ciclo de 30~segundos en las pruebas de despliegue realizadas.
+
 La tabla~\ref{tab:config-yaml} resume los archivos de configuración que parametrizan el sistema sin recompilar la imagen.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \small
 \caption{Archivos de configuración YAML del sistema.}
@@ -561,16 +565,14 @@ La tabla~\ref{tab:config-yaml} resume los archivos de configuración que paramet
 \end{tabular}
 \end{table}
 
-El contenedor se construyó con un \path{Dockerfile} multi-etapa mínimo: instalación de dependencias Python desde \path{requirements.txt}, copia del código fuente y arranque de \path{inference.py} con usuario sin privilegios. Los directorios \path{models/}, \path{config/} y \path{logs/} se montaron como volúmenes para permitir actualizar pesos y umbrales sin reconstruir la imagen. Los límites de recursos (1 CPU virtual y 2~GB de RAM) resultaron suficientes para el ciclo de 30~segundos en las pruebas de despliegue realizadas.
+La tabla~\ref{tab:demo-vs-prod} contrasta el perfil \texttt{dev} de Docker Compose con el despliegue productivo.
 
-La tabla~\ref{tab:demo-vs-prod} contrasta el perfil \texttt{dev} de Docker Compose con el despliegue productivo. En la organización cliente, únicamente el servicio \texttt{anomaly-detection} se agregó a la infraestructura existente; los servicios auxiliares del perfil \texttt{dev} cumplieron exclusivamente fines de desarrollo y demostración académica.
-
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \small
 \caption{Comparación entre entorno demo y despliegue productivo.}
 \label{tab:demo-vs-prod}
-\begin{tabular}{@{}p{0.28\textwidth}p{0.30\textwidth}p{0.30\textwidth}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}@{}}
 \toprule
 \textbf{Componente} & \textbf{Perfil \texttt{dev}} & \textbf{Producción} \\
 \midrule
@@ -583,6 +585,8 @@ Actualización de modelos & Volumen montado \path{./models} & Montaje equivalent
 \bottomrule
 \end{tabular}
 \end{table}
+
+En la organización cliente, únicamente el servicio \texttt{anomaly-detection} se agregó a la infraestructura existente; los servicios auxiliares del perfil \texttt{dev} cumplieron exclusivamente fines de desarrollo y demostración académica.
 
 \subsection{Registro, trazabilidad y requisitos no funcionales}
 
