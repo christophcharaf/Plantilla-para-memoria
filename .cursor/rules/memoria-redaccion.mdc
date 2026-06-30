@@ -66,4 +66,6 @@ Cap. 2: `framework`, `offline`, `gauges`, `pipeline`, `demo`, `forward-fill`, `d
 
 Cap. 3: `stride`, `dropout`, `bottleneck`, `batch`, `callbacks`, `dashboard`, `payload`, `compose`.
 
+Cap. 4: `endpoint`, `heartbeat`.
+
 Actualizar esta lista al cerrar cada capítulo nuevo.
