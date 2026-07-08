@@ -1,37 +1,43 @@
-% Chapter Template
+% Chapter 5
 
-\chapter{Conclusiones} % Main chapter title
+\chapter{Conclusiones}
+\label{Chapter5}
 
-\label{Chapter5} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
+En el presente capítulo se sintetizan los logros del trabajo frente a los objetivos planteados en la introducción, se explicitan los conocimientos de la carrera que sustentaron el desarrollo y se proponen líneas de trabajo futuro.
 
+\section{Logros alcanzados}
 
-%----------------------------------------------------------------------------------------
+El objetivo general consistió en diseñar e implementar un sistema capaz de detectar anomalías en tiempo de operación sobre un servicio de TV-over-IP, integrado al monitoreo existente y sin depender de umbrales estáticos ni de servicios analíticos externos. Ese objetivo se cumplió: se entregó un contenedor de detección que consulta Prometheus, reconstruye ventanas multivariadas con un autoencoder LSTM, compara el error con un umbral calibrado y emite alertas contextualizadas hacia Opsgenie (o JSM Operations en el entorno demostrativo), con enlaces a Grafana para inspección del intervalo afectado.
 
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
+Respecto de los objetivos específicos formulados en el capítulo~\ref{Chapter1}, se verificó lo siguiente:
 
-\section{Conclusiones generales }
+\begin{enumerate}
+\item Se identificaron y prepararon las métricas críticas del servicio mediante consultas PromQL declarativas, normalización con cotas fijas, variables temporales cíclicas y generación de ventanas deslizantes acordes al muestreo de 30~segundos. El pipeline se externalizó en archivos de configuración YAML y se reutilizó sin cambios entre entrenamiento e inferencia.
+\item Se entrenó un autoencoder LSTM compacto sobre 90~días de régimen nominal, con parada temprana y umbral fijado en el percentil 99,5 de los errores de validación. El modelo convergió de forma estable y separó en el conjunto de prueba las ventanas anómalas de las nominales con margen suficiente para operar con baja tasa de falsas alertas.
+\item Se integró el flujo de inferencia con deduplicación, confirmación por ciclos consecutivos, escalamiento por persistencia y notificación de resolución. Las pruebas extremo a extremo sobre Docker Compose validaron la cadena completa desde la inyección de anomalías hasta la alerta en JSM Operations.
+\item Se evaluó el sistema con métricas de reconstrucción y de clasificación sobre escenarios controlados. En el conjunto de prueba de 24~horas con anomalías inyectadas, el umbral desplegado alcanzó una precisión de 0,942, una sensibilidad de 0,981, un F1-score de 0,961 y una tasa de falsos positivos del 0,6~\%. La comparación con umbrales fijos univariados mostró una reducción sustancial de falsas alertas frente a reglas declarativas equivalentes.
+\end{enumerate}
 
-La idea de esta sección es resaltar cuáles son los principales aportes del trabajo realizado y cómo se podría continuar. Debe ser especialmente breve y concisa. Es buena idea usar un listado para enumerar los logros obtenidos.
+Más allá del cumplimiento formal de los objetivos, el trabajo aportó decisiones de diseño relevantes para el contexto operativo. El escalado \texttt{fixed\_minmax} y la paridad estricta entre entrenamiento e inferencia resultaron determinantes para desplegar un único par modelo--preprocesador sobre telemetría real sin recalibrar el escalador en cada ciclo. La agregación multivariada en una única señal de error simplificó la calibración del umbral frente a reglas independientes por métrica. El mecanismo de deduplicación redujo las notificaciones de un incidente sostenido de más de doce alertas a una apertura y una resolución, atacando directamente la fatiga de alertas que motivó el proyecto.
 
-En esta sección no se deben incluir ni tablas ni gráficos.
+La validación sobre la infraestructura autorizada de la empresa confirmó de forma cualitativa el comportamiento del detector en producción, sin exponer series confidenciales en esta memoria. Los resultados cuantitativos publicados corresponden al entorno demostrativo reproducible, que replica la semántica PromQL y la familia de métricas del servicio real.
 
-Algunas preguntas que pueden servir para completar este capítulo:
+Las limitaciones principales también quedaron acotadas. La caída de tráfico fue el tipo de anomalía más difícil de detectar: los cinco falsos negativos del ensayo pertenecieron a ese tramo, porque el patrón se asemeja a horarios de baja demanda legítima. La evaluación con etiquetas dependió de anomalías sintéticas inyectadas, coherente con el entrenamiento no supervisado, pero no sustituye un estudio prolongado con incidentes reales etiquetados por operaciones. Por último, el modelo priorizó eficiencia en CPU y simplicidad operativa por sobre la exploración de arquitecturas más pesadas.
 
-\begin{itemize}
-\item ¿Cuál es el grado de cumplimiento de los requerimientos?
-\item ¿Cuán fielmente se puedo seguir la planificación original (cronograma incluido)?
-\item ¿Se manifestó algunos de los riesgos identificados en la planificación? ¿Fue efectivo el plan de mitigación? ¿Se debió aplicar alguna otra acción no contemplada previamente?
-\item Si se debieron hacer modificaciones a lo planificado ¿Cuáles fueron las causas y los efectos?
-\item ¿Qué técnicas resultaron útiles para el desarrollo del proyecto y cuáles no tanto?
-\end{itemize}
+\section{Conocimientos aplicados}
 
+El desarrollo del trabajo movilizó conocimientos de distintas áreas de la carrera. En el plano de aprendizaje automático se aplicaron redes neuronales recurrentes, entrenamiento no supervisado con autoencoders, calibración de umbrales y métricas de clasificación. En ingeniería de software se diseñó un pipeline modular en Python, con contenedor Docker, orquestación mediante Docker Compose y configuración declarativa en YAML. En materias vinculadas a datos y estadística intervinieron el preprocesamiento de series temporales, la partición cronológica de conjuntos y el análisis de distribuciones de error. Finalmente, en el dominio de operaciones y confiabilidad de servicios se integraron prácticas de observabilidad con Prometheus y Grafana, gestión de alertas y diseño orientado a reducir falsos positivos en producción.
 
-%----------------------------------------------------------------------------------------
-%	SECTION 2
-%----------------------------------------------------------------------------------------
-\section{Próximos pasos}
+\section{Trabajo futuro}
 
-Acá se indica cómo se podría continuar el trabajo más adelante.
+Las líneas de mejora identificadas a partir de los ensayos y de la validación operativa son las siguientes:
+
+\begin{enumerate}
+\item Reforzar la sensibilidad ante degradaciones sutiles, en particular caídas de tráfico prolongadas, mediante variables derivadas adicionales, ventanas más largas o umbrales adaptativos por contexto horario.
+\item Incorporar un circuito de retroalimentación con el equipo de operaciones: registro estructurado de falsos positivos y falsos negativos reales para recalibrar el umbral o reentrenar el modelo con periodicidad definida.
+\item Automatizar el reentrenamiento y la promoción de artefactos (modelo, preprocesador y umbral) con controles de regresión sobre métricas de validación, de modo que el ciclo de actualización no dependa de intervención manual.
+\item Explorar arquitecturas alternativas (por ejemplo modelos con atención o codificadores convolucionales temporales) si el volumen de métricas o la complejidad estacional del servicio aumentan, con evaluación del costo en CPU frente a la ganancia en sensibilidad.
+\item Extender la cobertura a servicios adicionales del ecosistema TV-over-IP reutilizando el mismo esqueleto de pipeline y adaptando únicamente las consultas PromQL y las cotas de normalización por dominio.
+\end{enumerate}
+
+En conjunto, el trabajo demostró que un autoencoder LSTM acoplado al stack de observabilidad ya adoptado en la organización constituye una alternativa viable y auditable frente a umbrales fijos, siempre que el preprocesamiento, la calibración del umbral y la gestión de alertas se diseñen en conjunto con el equipo de operaciones.

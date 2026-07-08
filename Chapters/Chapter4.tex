@@ -21,9 +21,9 @@ El primer plano valoró la calidad de reconstrucción sobre tramos considerados 
 
 El entrenamiento utilizó el historial de 90~días descrito en el capítulo~\ref{Chapter3}, particionado en 80~\% para ajuste y 20~\% final para validación, con preservación del orden cronológico para evitar filtraciones de información futura. Ese conjunto de validación cumplió dos funciones: guiar la parada temprana y proporcionar la distribución de errores sobre la que se calibró el umbral de detección.
 
-Para la evaluación de clasificación se construyó un conjunto de prueba independiente de 24~horas, generado por el mismo núcleo de simulación que el servicio simulado (\path{traffic\_simulation\_core.py}) pero con una semilla distinta de la del entrenamiento, de modo que no compartiera realizaciones concretas de ruido con los datos de ajuste. Sobre ese conjunto se inyectaron tres ventanas de anomalía con instantes y duraciones conocidas, listadas en la tabla~\ref{tab:anomalias-inyectadas}. Cada ventana deslizante de prueba se etiquetó como anómala cuando contuvo al menos un instante perteneciente a un tramo inyectado.
+Para la evaluación de clasificación se construyó un conjunto de prueba independiente de 24~horas, generado por el mismo núcleo de simulación que el servicio simulado (\path{traffic\_simulation\_core.py}) pero con una semilla distinta de la del entrenamiento, de modo que no compartiera realizaciones concretas de ruido con los datos de ajuste. Sobre ese conjunto se inyectaron tres ventanas de anomalía con instantes y duraciones conocidas, listadas en la tabla~\ref{tab:anomalias-inyectadas}.
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \small
 \caption{Anomalías inyectadas en el conjunto de prueba de 24~horas.}
@@ -39,7 +39,7 @@ Pico de memoria & 60~min & Memoria residente de 3 a 4~GB y mayor consumo de CPU 
 \end{tabular}
 \end{table}
 
-La elección de tres tipos heterogéneos (incremento sostenido, caída abrupta y consumo anómalo de recursos) buscó cubrir formas distintas de degradación: una de cola superior de latencia, una de descenso de demanda y una de presión de recursos. Esa diversidad permitió analizar no solo el desempeño agregado, sino también el comportamiento del detector frente a anomalías de distinta naturaleza.
+Cada ventana deslizante de prueba se etiquetó como anómala cuando contuvo al menos un instante perteneciente a un tramo inyectado. La elección de tres tipos heterogéneos (incremento sostenido, caída abrupta y consumo anómalo de recursos) buscó cubrir formas distintas de degradación: una de cola superior de latencia, una de descenso de demanda y una de presión de recursos. Esa diversidad permitió analizar no solo el desempeño agregado, sino también el comportamiento del detector frente a anomalías de distinta naturaleza.
 
 \subsection{Confidencialidad de los resultados}
 
@@ -64,14 +64,16 @@ Los resultados del entrenamiento y del conjunto de prueba con anomalías inyecta
 
 El entrenamiento convergió de forma estable. La pérdida de entrenamiento descendió hasta el orden de $1{,}4\times10^{-3}$ y la pérdida de validación se estabilizó en torno a $3\times10^{-4}$ en la escala normalizada, sin signos de sobreajuste tras la activación de la parada temprana. Sobre los tramos nominales del conjunto de prueba, el error de reconstrucción se concentró en valores bajos: el percentil 95 quedó cerca de $6\times10^{-4}$ y el percentil 99 cerca de $1{,}7\times10^{-3}$, por debajo del umbral calibrado de $0{,}0025$. Las ventanas anómalas, en cambio, alcanzaron errores de hasta dos órdenes de magnitud mayores. Ese margen entre el error típico del régimen nominal y el umbral es el que sostiene una baja tasa de falsas alertas sobre comportamiento habitual.
 
-La figura~\ref{fig:eval-modelo} resume la evaluación en cuatro paneles. El panel superior izquierdo muestra la distribución del error de reconstrucción para ventanas nominales y anómalas: las primeras se concentran en valores bajos, a la izquierda del umbral, mientras que las segundas se desplazan hacia errores marcadamente mayores. Esa separación entre ambas poblaciones es la propiedad que hace viable la detección por umbral sobre una única señal escalar.
+La figura~\ref{fig:eval-modelo} resume la evaluación en cuatro paneles. 
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.95\textwidth]{./Figures/evaluacion_modelo.png}
 \caption{Evaluación del modelo sobre el conjunto de prueba con anomalías inyectadas: distribución del error, línea de tiempo de detección, matriz de confusión y métricas.}
 \label{fig:eval-modelo}
 \end{figure}
+
+El panel superior izquierdo muestra la distribución del error de reconstrucción para ventanas nominales y anómalas: las primeras se concentran en valores bajos, a la izquierda del umbral, mientras que las segundas se desplazan hacia errores marcadamente mayores. Esa separación entre ambas poblaciones es la propiedad que hace viable la detección por umbral sobre una única señal escalar.
 
 \subsection{Reconstrucción de ventanas nominales y anómalas}
 
@@ -110,9 +112,9 @@ La sensibilidad cercana a 0,98 indica que la mayoría de las ventanas anómalas 
 
 \subsection{Sensibilidad al umbral}
 
-El umbral es el parámetro que gobierna el compromiso entre detectar más anomalías y generar más falsas alertas. La tabla~\ref{tab:barrido-umbral} y la figura~\ref{fig:barrido-umbral} resumen un barrido en el que el umbral se recalculó como distintos percentiles del error sobre las ventanas nominales del conjunto de prueba. Percentiles bajos aumentaron la sensibilidad a costa de más falsos positivos: en el percentil 95 la precisión cayó a 0,67 con una tasa de falsos positivos del 5~\%. El percentil 99,5 ofreció el mejor compromiso, con F1-score de 0,965 y una tasa de falsos positivos del 0,5~\%. El percentil 99,9 ilustró el riesgo opuesto: un único tramo nominal con error atípicamente alto elevó el umbral de forma desproporcionada, la sensibilidad se desplomó a 0,27 y la mayoría de las anomalías quedaron sin detectar.
+La tabla~\ref{tab:barrido-umbral} y la figura~\ref{fig:barrido-umbral} resumen un barrido en el que el umbral se recalculó como distintos percentiles del error sobre las ventanas nominales del conjunto de prueba. Percentiles bajos aumentaron la sensibilidad a costa de más falsos positivos: en el percentil 95 la precisión cayó a 0,67 con una tasa de falsos positivos del 5~\%. 
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \small
 \caption{Barrido del umbral sobre percentiles del error en ventanas nominales.}
@@ -130,9 +132,11 @@ El umbral es el parámetro que gobierna el compromiso entre detectar más anomal
 \end{tabular}
 \end{table}
 
-\begin{figure}[h]
+El percentil 99,5 ofreció el mejor compromiso, con F1-score de 0,965 y una tasa de falsos positivos del 0,5~\%. El percentil 99,9 ilustró el riesgo opuesto: un único tramo nominal con error atípicamente alto elevó el umbral de forma desproporcionada, la sensibilidad se desplomó a 0,27 y la mayoría de las anomalías quedaron sin detectar.
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.80\textwidth]{./Figures/barrido_umbral.png}
+\includegraphics[width=0.72\textwidth]{./Figures/barrido_umbral.png}
 \caption{Variación de precisión, sensibilidad, F1-score y tasa de falsos positivos según el percentil del error en ventanas nominales adoptado como umbral.}
 \label{fig:barrido-umbral}
 \end{figure}
@@ -201,9 +205,9 @@ Los 16 falsos positivos se concentraron en ventanas de transición que combinan 
 
 \subsection{Contribución de cada variable al error}
 
-El error de reconstrucción agrega las once variables de la ventana, pero no todas contribuyen por igual ante una anomalía. La tabla~\ref{tab:error-por-variable} compara, para las cinco métricas técnicas, el error mediano en ventanas nominales con el error medio en ventanas anómalas. En régimen nominal todas las variables se reconstruyeron con error muy bajo. Ante anomalías, la latencia percentil 95 dominó ampliamente el error, con un valor varios órdenes de magnitud superior al del resto de las métricas, reflejo de que el pico de latencia fue la perturbación más extrema del ensayo. Las variables temporales derivadas se reconstruyeron con error reducido en ambos regímenes, lo que confirma que aportan contexto estable sobre el momento del día sin introducir ruido en la señal de anomalía.
+El error de reconstrucción agrega las once variables de la ventana, pero no todas contribuyen por igual ante una anomalía. La tabla~\ref{tab:error-por-variable} compara, para las cinco métricas técnicas, el error cuadrático medio normalizado por variable: la mediana en ventanas nominales y la media en ventanas anómalas. En régimen nominal todas las variables se reconstruyeron con error muy bajo. Ante anomalías, la latencia percentil 95 dominó ampliamente el error, con un valor varios órdenes de magnitud superior al del resto de las métricas, reflejo de que el pico de latencia fue la perturbación más extrema del ensayo. Las variables temporales derivadas se reconstruyeron con error reducido en ambos regímenes, lo que confirma que aportan contexto estable sobre el momento del día sin introducir ruido en la señal de anomalía.
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \small
 \caption{Error de reconstrucción por variable técnica: mediana en ventanas nominales y media en ventanas anómalas.}
@@ -219,8 +223,6 @@ El error de reconstrucción agrega las once variables de la ventana, pero no tod
 \texttt{cpu\_usage} & 0{,}000077 & 0{,}076 \\
 \bottomrule
 \end{tabular}
-\\[0.5em]
-{\footnotesize Nota: error cuadrático medio normalizado por variable.}
 \end{table}
 
 \subsection{Errores observados en el despliegue real}
@@ -278,7 +280,7 @@ Para documentar el comportamiento extremo a extremo se ejecutó una demostració
 
 La figura~\ref{fig:demo-grafana} muestra el panel de Grafana durante el episodio: la latencia percentil 95 se elevó a unos 9--10~s mientras el resto de las métricas permaneció en régimen nominal y el servicio continuó reportándose como activo. Esa discrepancia univariada dentro de un contexto multivariado nominal es precisamente la señal que el autoencoder traduce en un error de reconstrucción elevado.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{./Figures/demo_grafana.png}
 \caption{Panel de Grafana durante la demostración en vivo: pico sostenido de latencia percentil 95 con el resto de métricas nominales.}
@@ -287,7 +289,7 @@ La figura~\ref{fig:demo-grafana} muestra el panel de Grafana durante el episodio
 
 La figura~\ref{fig:demo-logs} reproduce el extracto de registros del detector para el mismo incidente. Se observa la secuencia completa: detección potencial en el primer ciclo, confirmación como \texttt{NEW ANOMALY} en el segundo, envío de la alerta a JSM, registros periódicos de deduplicación (\textit{heartbeat}) mientras la anomalía persistió, escalamiento a los 30~minutos y cierre automático cuando las métricas se normalizaron.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{./Figures/demo_logs.png}
 \caption{Extracto de registros del detector durante la demostración: apertura, deduplicación, escalamiento y resolución.}
@@ -296,17 +298,17 @@ La figura~\ref{fig:demo-logs} reproduce el extracto de registros del detector pa
 
 En JSM Operations la alerta de apertura apareció con prioridad P3, el error de reconstrucción, la confianza, la comparación métrica observada vs.\ reconstruida y un enlace contextual al panel de Grafana acotado al intervalo de la anomalía (panel izquierdo de la figura~\ref{fig:demo-jsm}). La integración \texttt{autoencoder-alerting (API)} identificó el origen del payload HTTP. Tras 30~minutos de persistencia, el mecanismo de escalamiento generó una segunda notificación de prioridad P2 con la duración acumulada y el error vigente (panel derecho). Tras eliminar la anomalía inyectada, el detector cerró la alerta en JSM con una nota de resolución que incluyó la duración del incidente.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
-\begin{minipage}{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{./Figures/demo_jsm_alerta.png}\\[0.3em]
-{\small (a) Alerta de apertura}
+\includegraphics[width=\textwidth]{./Figures/demo_jsm_alerta.png}\\[0.2em]
+{\small (a) Alerta de apertura.}
 \end{minipage}\hfill
-\begin{minipage}{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{./Figures/demo_jsm_escalacion.png}\\[0.3em]
-{\small (b) Escalamiento a los 30~min}
+\includegraphics[width=\textwidth]{./Figures/demo_jsm_escalacion.png}\\[0.2em]
+{\small (b) Escalamiento a los 30~min.}
 \end{minipage}
 \caption{Alertas en Jira Service Management Operations durante la demostración en vivo: apertura con contexto de detección y escalamiento por persistencia.}
 \label{fig:demo-jsm}
@@ -314,16 +316,20 @@ En JSM Operations la alerta de apertura apareció con prioridad P3, el error de 
 
 \subsection{Deduplicación de alertas}
 
-Un objetivo operativo central, derivado del problema de fatiga de alertas planteado en el capítulo~\ref{Chapter1}, fue evitar la repetición de notificaciones durante un mismo incidente. Sin deduplicación, una anomalía sostenida generaba una alerta en cada ciclo de 30~segundos. Con el mecanismo de seguimiento por identificador único, confirmación por ciclos y notificación de resolución, cada incidente produjo una única alerta de apertura y una de cierre. La figura~\ref{fig:ciclo-vida-alerta} resume la máquina de estados implementada; la tabla~\ref{tab:deduplicacion} contrasta ambos comportamientos sobre un episodio sostenido.
+Un objetivo operativo central, derivado del problema de fatiga de alertas planteado en el capítulo~\ref{Chapter1}, fue evitar la repetición de notificaciones durante un mismo incidente. 
 
-\begin{figure}[htbp]
+La figura~\ref{fig:ciclo-vida-alerta} resume la máquina de estados implementada; la tabla~\ref{tab:deduplicacion} contrasta ambos comportamientos sobre un episodio sostenido.
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{./Figures/ciclo_vida_alerta.png}
+\includegraphics[width=0.78\textwidth]{./Figures/ciclo_vida_alerta.png}
 \caption{Ciclo de vida de una alerta: transiciones entre operación nominal, confirmación, deduplicación, escalamiento y resolución.}
 \label{fig:ciclo-vida-alerta}
 \end{figure}
 
-\begin{table}[h]
+Sin deduplicación, una anomalía sostenida generaba una alerta en cada ciclo de 30~segundos. Con el mecanismo de seguimiento por identificador único, confirmación por ciclos y notificación de resolución, cada incidente produjo una única alerta de apertura y una de cierre.
+
+\begin{table}[H]
 \centering
 \small
 \caption{Efecto de la deduplicación sobre un incidente sostenido.}

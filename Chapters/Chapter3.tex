@@ -29,7 +29,7 @@ Tras obtener las series por instancia, se agregaron los resultados según la sem
 
 Las series devueltas se integraron en un marco temporal común, con \texttt{timestamp} como índice.
 
-Cuando faltaban puntos aislados dentro del intervalo de muestreo, se aplicó forward-fill acotado antes de descartar ventanas incompletas. El cliente incorporó además un ajuste automático del paso de consulta cuando el rango solicitado superaba el límite de 11\,000 puntos por petición impuesto por Prometheus y preservó la cobertura temporal sin truncar silenciosamente el historial.
+Cuando faltaban puntos aislados dentro del intervalo de muestreo, se aplicó \textit{forward-fill} acotado antes de descartar ventanas incompletas. El cliente incorporó además un ajuste automático del paso de consulta cuando el rango solicitado superaba el límite de 11\,000 puntos por petición impuesto por Prometheus y preservó la cobertura temporal sin truncar silenciosamente el historial.
 
 Para el entrenamiento sobre el entorno autorizado de la empresa, el cliente apuntó a la instancia Prometheus interna. En el repositorio reproducible y en el perfil \texttt{dev} de Docker Compose, las mismas consultas se ejecutaron contra un servicio simulado instrumentado con \path{prometheus\_client}, compartiendo núcleo de generación con el generador sintético offline (\path{traffic\_simulation\_core.py}).
 
@@ -46,11 +46,11 @@ La tabla~\ref{tab:promql-queries} detalla las consultas PromQL configuradas, la 
 \toprule
 \textbf{Variable} & \textbf{Consulta PromQL (resumida)} & \textbf{Agreg.} & \textbf{Interpretación} \\
 \midrule
-\texttt{request\_rate} & \texttt{rate(http\_requests\_\allowbreak total[5m])} & sum & Demanda instantánea sobre el servicio \\
-\texttt{latency\_p95} & \texttt{histogram\_quantile(0.95,}\allowbreak\texttt{ rate(...[5m]))} & max & Cola superior de tiempos de respuesta \\
-\texttt{memory\_usage} & \texttt{process\_resident\_\allowbreak memory\_bytes\{...\}} & mean & Presión de memoria del proceso \\
-\texttt{error\_rate} & \texttt{rate(http\_request\_\allowbreak errors\_total[5m])} & sum & Tasa de respuestas erróneas \\
-\texttt{cpu\_usage} & \texttt{rate(process\_cpu\_\allowbreak seconds\_total[5m])} & sum & Consumo de CPU del servicio \\
+\texttt{request\_rate} & \texttt{rate(http\_requests\_\allowbreak total[5m])} & \texttt{sum} & Demanda instantánea sobre el servicio \\
+\texttt{latency\_p95} & \texttt{histogram\_quantile(0.95,}\allowbreak\texttt{ rate(...[5m]))} & \texttt{max} & Cola superior de tiempos de respuesta \\
+\texttt{memory\_usage} & \texttt{process\_resident\_\allowbreak memory\_bytes\{...\}} & \texttt{mean} & Presión de memoria del proceso \\
+\texttt{error\_rate} & \texttt{rate(http\_request\_\allowbreak errors\_total[5m])} & \texttt{sum} & Tasa de respuestas erróneas \\
+\texttt{cpu\_usage} & \texttt{rate(process\_cpu\_\allowbreak seconds\_total[5m])} & \texttt{sum} & Consumo de CPU del servicio \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -143,7 +143,7 @@ La tabla~\ref{tab:pipeline-etapas} detalla entradas, salidas y artefactos de cad
 Recolección & Consultas PromQL $\rightarrow$ series por métrica & \texttt{PrometheusClient}, \path{config/data.yaml} \\
 Alineación & Series $\rightarrow$ marco temporal unificado & \texttt{pandas}, forward-fill acotado \\
 Ingeniería & Marco + reloj $\rightarrow$ 11 variables & \texttt{add\_temporal\_features} de \texttt{preprocessor} \\
-Normalización & Valores crudos $\rightarrow$ $[0,1]$ fijo & \texttt{MinMaxScaler} con cotas en YAML \\
+Normalización & Crudos $\rightarrow$ $[0,1]$ fijo & \texttt{MinMaxScaler}, cotas YAML \\
 Ventanas & Serie $\rightarrow$ $(N, 20, 11)$ & \texttt{WindowGenerator} \\
 Persistencia & Escalador y metadatos & \path{preprocessor.joblib} \\
 \bottomrule
@@ -159,21 +159,21 @@ El repositorio entregable agrupó la lógica en cuatro paquetes bajo \path{src/}
 \footnotesize
 \caption{Módulos implementados y responsabilidad funcional.}
 \label{tab:modulos}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.56\textwidth}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.26\textwidth}>{\raggedright\arraybackslash}p{0.64\textwidth}@{}}
 \toprule
 \textbf{Módulo / script} & \textbf{Responsabilidad} \\
 \midrule
-\path{src/data/prometheus\_client.py} & Consultas HTTP, agregación y alineación de series \\
-\path{src/data/preprocessor.py} & Variables temporales y normalización \\
-\path{src/data/windowing.py} & Ventanas deslizantes para entrenamiento e inferencia \\
-\path{src/data/synthetic\_data.py} & Generación offline de series de respaldo \\
-\path{src/models/lstm\_autoencoder.py} & Definición, entrenamiento y persistencia del modelo \\
-\path{src/alerting/detector.py} & Puntuación de anomalía por ventana \\
-\path{src/alerting/opsgenie\_client.py} & Emisión de alertas y notificaciones de resolución \\
-\path{src/alerting/grafana\_links.py} & Construcción de URLs contextuales al panel de Grafana \\
-\path{scripts/train.py} & Orquestación del entrenamiento extremo a extremo \\
-\path{scripts/inference.py} & Bucle de detección en tiempo de operación \\
-\path{scripts/tune\_model.py} & Exploración de arquitecturas sin afectar artefactos productivos \\
+\texttt{PrometheusClient} & Consultas HTTP, agregación y alineación de series \\
+\texttt{DataPreprocessor} & Variables temporales y normalización \\
+\texttt{Windowing} & Ventanas deslizantes para entrenamiento e inferencia \\
+\texttt{SyntheticData} & Generación offline de series de respaldo \\
+\texttt{LSTMAutoencoder} & Definición, entrenamiento y persistencia del modelo \\
+\texttt{Detector} & Puntuación de anomalía por ventana \\
+\texttt{OpsgenieClient} & Emisión de alertas y notificaciones de resolución \\
+\texttt{GrafanaLinks} & Construcción de URLs contextuales al panel de Grafana \\
+\texttt{train.py} & Orquestación del entrenamiento extremo a extremo \\
+\texttt{inference.py} & Bucle de detección en tiempo de operación \\
+\texttt{tune\_model.py} & Exploración de arquitecturas sin afectar artefactos productivos \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -186,48 +186,47 @@ Cualquier divergencia en el orden de transformaciones, en las columnas activas o
 
 Primero, el mismo objeto \texttt{DataPreprocessor} serializado se cargó en inferencia sin reajuste sobre datos recientes. Segundo, las consultas PromQL y las reglas de agregación se leyeron del mismo archivo \path{config/data.yaml} en ambos modos. Tercero, la generación de ventanas en inferencia utilizó exclusivamente los últimos $T$ puntos completos, mientras que en entrenamiento se generó el conjunto completo con stride~$=1$, pero aplicando la misma función de extracción por ventana.
 
-La tabla~\ref{tab:train-inferencia-paridad} contrasta el comportamiento en cada fase. Las diferencias restantes son intencionales: el solapamiento masivo solo tiene sentido offline para aumentar muestras de entrenamiento, mientras que en línea basta la ventana corriente.
-
-\begin{table}[h]
-\centering
-\small
-\caption{Paridad y diferencias deliberadas entre entrenamiento e inferencia.}
-\label{tab:train-inferencia-paridad}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}@{}}
-\toprule
-\textbf{Aspecto} & \textbf{Entrenamiento} & \textbf{Inferencia} \\
-\midrule
-Fuente de datos & 90~días históricos & Últimos 10~minutos \\
-Consultas PromQL & \path{config/data.yaml} & Mismo archivo \\
-Preprocesador & \texttt{fit\_transform} + persistencia & \texttt{load} + \texttt{transform} \\
-Generación de ventanas & \texttt{create\_\allowbreak sequences}, stride~$=1$ & \texttt{create\_\allowbreak single\_window} \\
-Ventana incompleta & Descartada al particionar & Omite ciclo (sin relleno) \\
-Salida del modelo & Pérdida MSE + umbral & Error $e$ vs.\ $\tau$ + alerta \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \section{Arquitectura del sistema}
 \label{sec:arquitectura-modelo}
 
-A continuación, en la figura \ref{fig:infra_demo.png} se ilustra la arquitectura del sistema desarrollado, desde el servicio simulado en Flask hasta la visualización y alertas por Grafana y Opsgenie respectivamente. 
+El sistema se organizó en capas acopladas al monitoreo existente. Un servicio simulado (en el entorno demostrativo) o la instancia productiva exponían métricas que Prometheus recolectaba periódicamente y consultaba el contenedor de detección. Grafana visualizó las series y Opsgenie recibió las alertas emitidas. La figura~\ref{fig:infra_demo.png} resume esta topología en el perfil \texttt{dev} de Docker Compose.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.9\linewidth]{./Figures/infra_demo.png}
-\caption{Estructura del sistema de detección.}
+\caption{Topología de despliegue del sistema de detección.}
 \label{fig:infra_demo.png}
 \end{figure}
 
-\subsection{Codificador y decodificador}
+El bloque detector de la figura anterior agrupa el pipeline de datos, el autoencoder LSTM y la lógica de umbral descritos en las secciones anteriores. 
 
-La arquitectura implementada en \texttt{LSTMAutoencoder} (\path{src/models/lstm\_autoencoder.py}) siguió el esquema codificador--bottleneck--decodificador de Malhotra et al., adaptado al vector de once variables y a la ventana de 20 pasos.
+La figura~\ref{fig:flujo-detector} detalla el flujo interno de inferencia: preprocesamiento de la ventana, codificación y decodificación, cálculo del error de reconstrucción y comparación con el umbral calibrado; ante una anomalía confirmada, se emiten alertas hacia Opsgenie y enlaces contextuales a Grafana.
+
+Las etapas \emph{Encoder LSTM} y \emph{Decoder LSTM} implementan el esquema codificador--bottleneck--decodificador de Malhotra et al. en el módulo \texttt{LSTMAutoencoder}, adaptado al vector de once variables y a la ventana de 20 pasos.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\linewidth]{./Figures/flow_diag.png}
+\caption{Flujo interno del contenedor de detección: desde la consulta a Prometheus hasta la emisión de alertas.}
+\label{fig:flujo-detector}
+\end{figure}
+
+\subsection{Encoder-Decoder LSTM}
+
+
 
 El codificador apiló tres capas \texttt{LSTM} con 64, 32 y 16 unidades respectivamente. Las dos primeras devolvieron secuencias completas (\texttt{return\_sequences=True}), y la tercera produjo el vector latente de dimensión 16. Entre capas recurrentes se insertó \textit{dropout} del 10~\% para regularizar.
 
-El decodificador expandió el latente mediante \texttt{RepeatVector}, replicándolo a lo largo de los 20 pasos temporales, y aplicó tres capas \texttt{LSTM} simétricas (16, 32 y 64 unidades) con dropout del 10~\%. La salida se obtuvo con una capa \texttt{TimeDistributed}\allowbreak\texttt{(Dense(11))} que reconstruyó las once variables en cada instante.
+El decodificador expandió el latente mediante \texttt{RepeatVector}, replicándolo a lo largo de los 20 pasos temporales, y aplicó tres capas \texttt{LSTM} simétricas (16, 32 y 64 unidades) con dropout del 10~\%. La salida se obtuvo con una capa \texttt{TimeDistributed}\allowbreak\texttt{(Dense(11))} que reconstruyó las once variables en cada instante. La figura~\ref{fig:lstm-autoencoder-arch} resume la pila de capas y las formas tensoriales intermedias.
 
-La tabla~\ref{tab:capas-modelo} resume la pila de capas, formas tensoriales intermedias y justificación de diseño.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{./Figures/lstm_autoencoder_arch.png}
+\caption{Arquitectura del autoencoder LSTM: codificador, \textit{bottleneck} latente y decodificador.}
+\label{fig:lstm-autoencoder-arch}
+\end{figure}
+
+La tabla~\ref{tab:capas-modelo} complementa el diagrama con el rol de cada capa.
 
 \begin{table}[h]
 \centering
@@ -272,14 +271,14 @@ Esos valores se utilizaron para asignar prioridad en Opsgenie (tabla~\ref{tab:op
 \small
 \caption{Asignación de prioridad Opsgenie según confianza de la anomalía.}
 \label{tab:opsgenie-prioridad}
-\begin{tabular}{@{}ccp{0.46\textwidth}@{}}
+\begin{tabular}{@{}c@{\hspace{1.5em}}c@{\hspace{1.5em}}>{\raggedright\arraybackslash}p{0.52\textwidth}@{}}
 \toprule
 \textbf{Prioridad} & \textbf{Umbral de $c$} & \textbf{Interpretación operativa} \\
 \midrule
-P1 & $c > 2{,}0$ & Desvío muy marcado. Respuesta inmediata \\
-P2 & $c > 1{,}0$ & Degradación significativa. Escalamiento si persiste \\
-P3 & $c > 0{,}5$ & Anomalía moderada. Revisión en guardia \\
-P4 & $c \leq 0{,}5$ & Registro sin escalamiento urgente \\
+P1 & $c > 2{,}0$ & Desvío muy marcado; respuesta inmediata. \\
+P2 & $c > 1{,}0$ & Degradación significativa; escalamiento si persiste. \\
+P3 & $c > 0{,}5$ & Anomalía moderada; revisión en guardia. \\
+P4 & $c \leq 0{,}5$ & Registro sin escalamiento urgente. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -365,7 +364,7 @@ Etiquetas & Régimen no supervisado: entrenamiento sobre tramos nominales. \\
 
 La figura~\ref{fig:dataset-dist} muestra la distribución marginal de las cinco métricas técnicas sobre datos sintéticos ilustrativos con estacionalidad diaria compatible con el \textit{mock service}. Se incluye únicamente con fines demostrativos, dado que no corresponde publicar histogramas de la telemetría real.
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.92\textwidth]{./Figures/dataset_distribution.png}
 \caption{Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}
@@ -454,7 +453,7 @@ Los escenarios evaluados incluyeron bottleneck reducido ([32, 16, 8]), bottlenec
 
 Los criterios de selección combinaron la pérdida de validación, el margen entre error medio en datos nominales y el umbral propuesto, y la tasa de falsos positivos sobre ventanas sintéticas con anomalías inyectadas. La tabla~\ref{tab:tuning-candidatos} resume los candidatos evaluados; a continuación se comentan los resultados de cada variante.
 
-\begin{table}[htbp]
+\begin{table}[h]
 \centering
 \caption{Exploración de configuraciones alternativas (\texttt{tune\_model.py}).}
 \label{tab:tuning-candidatos}

@@ -4,7 +4,7 @@
 \label{Chapter1}
 \label{IntroGeneral}
 
-En el presente capítulo se contextualiza la detección de anomalías en servicios de televisión por protocolo de internet (TV-over-IP) \citep{itu_iptv_overview}. Se revisa el estado del arte de forma breve y se enuncian los objetivos del trabajo.
+En el presente capítulo se contextualiza la detección de anomalías en servicios de televisión por protocolo de internet (TV-over-IP) \citep{itu_iptv_overview}. Además, se revisa el estado del arte y se enuncian los objetivos del trabajo.
 
 \section{Servicios de TV-over-IP y desafíos operativos}
 
@@ -57,7 +57,9 @@ Paralelamente, los ecosistemas de observabilidad comercial integran funciones de
 
 La propuesta de este trabajo se acopla al \textit{stack} Prometheus--Grafana--Opsgenie \citep{salituro2020grafana, grafana_site, opsgenie_site} ya adoptado en la organización. Así se busca un equilibrio entre sensibilidad y falsos positivos calibrable con el equipo de operaciones.
 
-La tabla~\ref{tab:comparativa-enfoques} resume familias de enfoques y su relación típica con datos y métricas de evaluación. La tabla~\ref{tab:trabajos-referencia} sitúa de manera orientativa trabajos de referencia y la línea elegida en este trabajo. Ninguna de las dos pretende ser exhaustiva, sino ubicar la propuesta en el panorama habitual de ingeniería de confiabilidad y aprendizaje automático.
+La tabla~\ref{tab:comparativa-enfoques} resume familias de enfoques y su relación típica con datos y métricas de evaluación. 
+
+Para fines orientativos, Malhotra et al. \citep{malhotra2015long} entrenaron un encoder-decoder LSTM sobre series multivariadas de sensores y utilizaron el error de reconstrucción como señal de anomalía; Liu et al. \citep{liu2008isolation} aplicaron \textit{isolation forest} sobre vectores de características con puntaje de anomalía; en esta memoria se adoptó un autoencoder LSTM sobre telemetría operativa de TV-over-IP con error de reconstrucción y umbral calibrado. Ninguno de estos resúmenes pretende ser exhaustivo, sino ubicar la propuesta en el panorama habitual de ingeniería de confiabilidad y aprendizaje automático.
 
 \begin{table}[h]
 \centering
@@ -65,28 +67,12 @@ La tabla~\ref{tab:comparativa-enfoques} resume familias de enfoques y su relaci�
 \label{tab:comparativa-enfoques}
 \begin{tabular}{@{}p{0.21\textwidth}p{0.23\textwidth}p{0.21\textwidth}p{0.27\textwidth}@{}}
 \toprule
-\textbf{Enfoque} & \textbf{Tipo de modelo o regla} & \textbf{Datos típicos} & \textbf{Métricas de desempeño habituales} \\
+\textbf{Enfoque} & \textbf{Tipo de modelo o regla} & \textbf{Datos típicos} & \textbf{Métricas habituales} \\
 \midrule
-Umbrales fijos y reglas & Reglas declarativas, comparaciones con constantes & Series univariadas o pocas variables, supuestos estables & Tiempo de detección, acuerdo con incidentes conocidos, carga de falsas alertas. \\
-Modelos clásicos de anomalía & Por ejemplo aislamiento, kNN, métodos estadísticos multivariados & Vectores de características por instante o ventana corta & Precisión, exhaustividad (\textit{recall}), F1 si existe etiquetado parcial. \\
-Modelos secuenciales profundos & Autoencoder LSTM, otras RNN, a veces combinadas con atención & Ventanas multivariadas de series temporales & Error de reconstrucción, AUC--PR, F1 sobre eventos etiquetados. \\
-Productos comerciales de observabilidad & Algoritmos propietarios, a veces combinados con reglas & Telemetría agregada en plataforma & Definidas por el proveedor con un foco en integración. \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[h]
-\centering
-\small
-\caption{Trabajos de referencia y línea adoptada en esta memoria (orientación conceptual).}
-\label{tab:trabajos-referencia}
-\begin{tabular}{@{}p{0.22\textwidth}p{0.24\textwidth}p{0.22\textwidth}p{0.26\textwidth}@{}}
-\toprule
-\textbf{Referencia} & \textbf{Modelo o método} & \textbf{Tipo de datos} & \textbf{Señal o métrica de detección} \\
-\midrule
-Malhotra et al. \citep{malhotra2015long} & Codificador-decodificador LSTM & Series multivariadas de sensores & Error de reconstrucción \\
-Liu et al. \citep{liu2008isolation} & Isolation forest & Vectores de características & Puntaje de anomalía \\
-Propuesta de esta memoria & Autoencoder LSTM & Telemetría operativa de TV-over-IP & Error de reconstrucción y umbral calibrado \\
+Umbrales fijos & Reglas fijas & Series univariadas & Tiempo de detección alto, fasas alertas \\
+Modelos clásicos & kNN, Isolation Forest, etc. & Ventanas vectorizadas & Precisión, \textit{recall}, F1 \\
+Modelos secuenciales profundos & Autoencoder LSTM, RNN & Ventanas multivariadas & Error de reconstrucción, F1 \\
+Productos comerciales & Algoritmos propietarios & Telemetría agregada & Integración con el proveedor \\
 \bottomrule
 \end{tabular}
 \end{table}

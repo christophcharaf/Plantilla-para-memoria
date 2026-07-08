@@ -14,7 +14,7 @@ Para el preprocesamiento se utilizó \texttt{scikit-learn} \citep{pedregosa2011s
 
 La manipulación de las series temporales se apoyó en \texttt{NumPy} \citep{harris2020numpy} y \texttt{pandas} \citep{mckinney2010pandas}, estándares en Python para arreglos n-dimensionales y tablas indexadas por tiempo. La obtención de métricas desde Prometheus se realizó vía HTTP con la biblioteca \texttt{requests} \citep{requests_site}, mientras que la instrumentación del servicio simulado utilizó el cliente oficial \texttt{prometheus\_client} \citep{prometheus_client_site}, que expone contadores e histogramas en el formato esperado por el recolector. La carga de archivos de configuración en formato YAML se delegó en \texttt{PyYAML} \citep{pyyaml_site}, y la generación de gráficos de evaluación \textit{offline} se realizó con \texttt{matplotlib} y \texttt{seaborn} \citep{matplotlib_site, seaborn_site}. 
 
-En entornos de observabilidad, la elección del stack analítico no es independiente del stack de despliegue: bibliotecas con dependencias pesadas o con requisitos de GPU dificultan la ejecución periódica en contenedores pequeños. Se priorizaron componentes maduros en CPU, serialización explícita de preprocesadores y modelos, y clientes HTTP livianos para consultar Prometheus sin introducir capas intermedias.La tabla~\ref{tab:bibliotecas} resume las bibliotecas principales y el rol que cumplen dentro del sistema.
+En entornos de observabilidad, la elección del stack analítico no es independiente del stack de despliegue: bibliotecas con dependencias pesadas o con requisitos de GPU dificultan la ejecución periódica en contenedores pequeños. Se priorizaron componentes maduros en CPU, serialización explícita de preprocesadores y modelos, y clientes HTTP livianos para consultar Prometheus sin introducir capas intermedias. La tabla~\ref{tab:bibliotecas} resume las bibliotecas principales y el rol que cumplen dentro del sistema.
 
 \begin{table}[h]
 \centering
@@ -95,13 +95,13 @@ La tabla~\ref{tab:infraestructura} resume el entorno técnico bajo el que se ent
 \toprule
 \textbf{Componente} & \textbf{Descripción} \\
 \midrule
-Lenguaje y entorno base & Python 3.10 sobre imagen \path{python:3.10-slim}. \\
-Orquestación de servicios & Docker Compose con perfil \texttt{dev} para entorno completo de pruebas. \\
-Recursos del contenedor de detección & 1.0 CPU virtual y 2~GB de memoria RAM (límite en \path{docker-compose.yml}). \\
-Aceleración por GPU & No utilizada. Todo el cómputo se realizó en CPU. \\
-Servicios auxiliares & Prometheus, Grafana y servicio simulado para pruebas. \\
-Red & Red puente \texttt{monitoring} en Docker, sin exposición pública. \\
-Destino de despliegue productivo & Infraestructura propia de la empresa cliente sobre AWS, sin dependencia de servicios analíticos de terceros. \\
+Lenguaje y environment & Python 3.10 (\path{python:3.10-slim}). \\
+Orquestación & Docker Compose, perfil \texttt{dev}. \\
+Uso de recursos & 1 CPU, 2~GB RAM. \\
+Aceleración por GPU & No (solo CPU). \\
+Servicios auxiliares & Prometheus, Grafana, servicio simulado. \\
+Red & Puente \texttt{monitoring}, sin exposición pública. \\
+Destino de deploy & AWS propia, sin analítica de terceros. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -109,33 +109,22 @@ Destino de despliegue productivo & Infraestructura propia de la empresa cliente 
 \section{Métricas de evaluación}
 \label{sec:metricas-evaluacion}
 
-La evaluación del sistema combinó dos planos complementarios. En el primero se valoró la calidad de reconstrucción del autoencoder, base del aprendizaje no supervisado, mediante el error cuadrático medio (MSE) como función de pérdida y señal escalar de anomalía, y el error absoluto medio (MAE) como métrica auxiliar de monitoreo. En el segundo se valoró la capacidad de detección sobre ventanas con anomalías sintéticas inyectadas, para lo cual se emplearon métricas de clasificación binaria habituales: precisión, \textit{recall}, \textit{F1-score} y tasa de falsos positivos. La distinción entre ambos planos respondió al carácter no supervisado del entrenamiento: las métricas de clasificación solo pudieron computarse en escenarios controlados con anomalías conocidas, mientras que el error de reconstrucción se midió de forma continua sobre tramos nominales.
+La evaluación del sistema combinó dos planos complementarios. En el primero se valoró la calidad de reconstrucción del autoencoder, base del aprendizaje no supervisado, mediante el error cuadrático medio (MSE) \citep{chollet2015keras} como función de pérdida y señal escalar de anomalía, y el error absoluto medio (MAE) como métrica auxiliar de monitoreo. 
 
-La tabla~\ref{tab:metricas-evaluacion} resume las métricas utilizadas, su definición y el propósito que cumplieron en la validación del sistema.
+En el segundo se valoró la capacidad de detección sobre ventanas con anomalías sintéticas inyectadas, y para ello se emplearon métricas de clasificación binaria habituales \citep{pedregosa2011scikit}: precisión, \textit{recall}, \textit{F1-score} y tasa de falsos positivos. 
 
-\begin{table}[h]
-\centering
-\small
-\caption{Métricas de evaluación utilizadas para la validación del sistema.}
-\label{tab:metricas-evaluacion}
-\begin{tabular}{@{}p{0.24\textwidth}p{0.30\textwidth}p{0.36\textwidth}@{}}
-\toprule
-\textbf{Métrica} & \textbf{Definición} & \textbf{Propósito en la evaluación} \\
-\midrule
-MSE & Error cuadrático medio entre la ventana de entrada y su reconstrucción. & Función de pérdida del entrenamiento y señal escalar de anomalía en inferencia. \\
-\addlinespace
-MAE & Error absoluto medio entre entrada y reconstrucción. & Métrica auxiliar de monitoreo durante el entrenamiento, menos sensible a valores atípicos. \\
-\addlinespace
-Precisión & Fracción de ventanas marcadas como anómalas que efectivamente lo eran. & Controlar la proporción de falsas alertas elevadas al servicio de guardia. \\
-\addlinespace
-\textit{recall} & Fracción de anomalías reales correctamente detectadas. & Medir la cobertura de incidentes ante anomalías sintéticas inyectadas. \\
-\addlinespace
-\textit{F1-score} & Media armónica de precisión y exhaustividad. & Resumir en un único valor el compromiso entre falsas alertas y cobertura. \\
-\addlinespace
-Tasa de falsos positivos & Fracción de ventanas nominales marcadas erróneamente como anómalas. & Verificar la estabilidad del umbral sobre tramos de régimen nominal. \\
-\bottomrule
-\end{tabular}
-\end{table}
+La distinción entre ambos planos respondió al carácter no supervisado del entrenamiento: las métricas de clasificación solo pudieron computarse en escenarios controlados con anomalías conocidas, mientras que el error de reconstrucción se midió de forma continua sobre tramos nominales.
+
+Las métricas utilizadas y el propósito que cumplieron en la validación fueron los siguientes:
+
+\begin{itemize}
+\item MSE: error cuadrático medio entre la ventana de entrada y su reconstrucción; función de pérdida del entrenamiento y señal escalar de anomalía en inferencia.
+\item MAE: error absoluto medio entre entrada y reconstrucción; métrica auxiliar de monitoreo durante el entrenamiento, menos sensible a valores atípicos.
+\item Precisión: fracción de ventanas marcadas como anómalas que efectivamente lo eran; controla la proporción de falsas alertas elevadas al servicio de guardia.
+\item Recall: fracción de anomalías reales correctamente detectadas; mide la cobertura de incidentes ante anomalías sintéticas inyectadas.
+\item F1-score: media armónica de precisión y exhaustividad; resume en un único valor el compromiso entre falsas alertas y cobertura.
+\item Tasa de falsos positivos: fracción de ventanas nominales marcadas erróneamente como anómalas; verifica la estabilidad del umbral sobre tramos de régimen nominal.
+\end{itemize}
 
 El procedimiento concreto de cálculo de estas métricas, la calibración del umbral sobre la distribución de errores de validación y los resultados cuantitativos obtenidos se detallan en los capítulos de diseño y de resultados.
 

@@ -215,6 +215,204 @@ def make_infra_diagram(out_path: Path) -> None:
     plt.close(fig)
 
 
+def _draw_stack_box(
+    ax,
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    title: str,
+    subtitle: str | None = None,
+    facecolor: str = "#ffffff",
+    edgecolor: str = "#334155",
+    title_fontsize: float = 8.5,
+    subtitle_fontsize: float = 7.5,
+) -> None:
+    patch = FancyBboxPatch(
+        (x, y),
+        w,
+        h,
+        boxstyle="round,pad=0.015,rounding_size=0.05",
+        linewidth=1.1,
+        edgecolor=edgecolor,
+        facecolor=facecolor,
+        zorder=2,
+    )
+    ax.add_patch(patch)
+    if subtitle:
+        ax.text(
+            x + w / 2,
+            y + h / 2 + 0.08,
+            title,
+            ha="center",
+            va="center",
+            fontsize=title_fontsize,
+            color="#0f172a",
+            zorder=3,
+        )
+        ax.text(
+            x + w / 2,
+            y + h / 2 - 0.12,
+            subtitle,
+            ha="center",
+            va="center",
+            fontsize=subtitle_fontsize,
+            color="#64748b",
+            zorder=3,
+        )
+    else:
+        ax.text(
+            x + w / 2,
+            y + h / 2,
+            title,
+            ha="center",
+            va="center",
+            fontsize=title_fontsize,
+            color="#0f172a",
+            zorder=3,
+        )
+
+
+def make_lstm_autoencoder_diagram(out_path: Path) -> None:
+    """Diagrama codificador--bottleneck--decodificador del LSTM autoencoder."""
+    title_fs = 11.5
+    sub_fs = 10.0
+
+    fig, ax = plt.subplots(figsize=(11.2, 6.4))
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 6)
+    ax.axis("off")
+
+    enc_box = FancyBboxPatch(
+        (0.25, 0.45),
+        3.15,
+        5.15,
+        boxstyle="round,pad=0.02,rounding_size=0.1",
+        linewidth=1.0,
+        edgecolor="#3b82f6",
+        facecolor="#eff6ff",
+        zorder=0,
+    )
+    dec_box = FancyBboxPatch(
+        (6.6, 0.45),
+        3.15,
+        5.15,
+        boxstyle="round,pad=0.02,rounding_size=0.1",
+        linewidth=1.0,
+        edgecolor="#059669",
+        facecolor="#ecfdf5",
+        zorder=0,
+    )
+    ax.add_patch(enc_box)
+    ax.add_patch(dec_box)
+    ax.text(1.82, 5.35, "Encoder", ha="center", fontsize=13, color="#1d4ed8", fontweight="bold")
+    ax.text(8.18, 5.35, "Decoder", ha="center", fontsize=13, color="#047857", fontweight="bold")
+
+    bw = 2.65
+    bh = 0.52
+    x_enc = 0.5
+    enc_layers = [
+        ("Entrada", "$(B, 20, 11)$"),
+        ("LSTM 64", "$(B, 20, 64)$"),
+        ("Dropout 10%", None),
+        ("LSTM 32", "$(B, 20, 32)$"),
+        ("Dropout 10%", None),
+        ("LSTM 16", "$(B, 16)$"),
+    ]
+    y_start = 4.35
+    y_step = 0.58
+    enc_centers: list[tuple[float, float]] = []
+    for i, (title, sub) in enumerate(enc_layers):
+        y = y_start - i * y_step
+        fc = "#f8fafc" if sub is None and "Dropout" in title else "#ffffff"
+        _draw_stack_box(
+            ax, x_enc, y, bw, bh, title, sub, facecolor=fc,
+            title_fontsize=title_fs, subtitle_fontsize=sub_fs,
+        )
+        enc_centers.append((x_enc + bw / 2, y + bh / 2))
+        if i > 0:
+            ax.annotate(
+                "",
+                xy=(enc_centers[-1][0], enc_centers[-1][1] + bh / 2),
+                xytext=(enc_centers[-2][0], enc_centers[-2][1] - bh / 2),
+                arrowprops=dict(arrowstyle="-|>", color="#475569", lw=1.2),
+                zorder=1,
+            )
+
+    _draw_stack_box(
+        ax,
+        3.95,
+        2.45,
+        1.7,
+        0.88,
+        "Latente",
+        "$(B, 16)$",
+        facecolor="#fef3c7",
+        edgecolor="#d97706",
+        title_fontsize=12,
+        subtitle_fontsize=10.5,
+    )
+    ax.text(4.8, 1.85, "Bottleneck", ha="center", fontsize=11, color="#b45309")
+
+    x_dec = 6.85
+    dec_layers = [
+        ("RepeatVector", "$(B, 20, 16)$"),
+        ("LSTM 16", "$(B, 20, 16)$"),
+        ("Dropout 10%", None),
+        ("LSTM 32", "$(B, 20, 32)$"),
+        ("Dropout 10%", None),
+        ("LSTM 64", "$(B, 20, 64)$"),
+        ("Dense(11)", "$(B, 20, 11)$"),
+    ]
+    dec_centers: list[tuple[float, float]] = []
+    y_dec_start = 4.35
+    y_dec_step = 0.5
+    for i, (title, sub) in enumerate(dec_layers):
+        y = y_dec_start - i * y_dec_step
+        fc = "#f8fafc" if sub is None and "Dropout" in title else "#ffffff"
+        _draw_stack_box(
+            ax, x_dec, y, bw, bh, title, sub, facecolor=fc,
+            title_fontsize=title_fs, subtitle_fontsize=sub_fs,
+        )
+        dec_centers.append((x_dec + bw / 2, y + bh / 2))
+        if i > 0:
+            ax.annotate(
+                "",
+                xy=(dec_centers[-1][0], dec_centers[-1][1] + bh / 2),
+                xytext=(dec_centers[-2][0], dec_centers[-2][1] - bh / 2),
+                arrowprops=dict(arrowstyle="-|>", color="#475569", lw=1.2),
+                zorder=1,
+            )
+
+    ax.annotate(
+        "",
+        xy=(3.95, 2.89),
+        xytext=(x_enc + bw, enc_centers[-1][1]),
+        arrowprops=dict(arrowstyle="-|>", color="#475569", lw=1.3),
+        zorder=1,
+    )
+    ax.annotate(
+        "",
+        xy=(x_dec, dec_centers[0][1]),
+        xytext=(3.95 + 1.7, 2.89),
+        arrowprops=dict(arrowstyle="-|>", color="#475569", lw=1.3),
+        zorder=1,
+    )
+
+    ax.text(
+        5.0,
+        0.15,
+        "TimeDistributed en la capa de salida",
+        ha="center",
+        fontsize=10,
+        color="#64748b",
+    )
+
+    fig.tight_layout(pad=0.1)
+    fig.savefig(out_path, dpi=280, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+
+
 def main() -> None:
     out_dir = Path(__file__).resolve().parents[1] / "Figures"
     out_dir.mkdir(exist_ok=True)
@@ -230,12 +428,15 @@ def main() -> None:
 
     dist_path = out_dir / "dataset_distribution.png"
     infra_path = out_dir / "infra_demo.png"
+    ae_path = out_dir / "lstm_autoencoder_arch.png"
 
     make_dataset_distribution(dist_path)
     make_infra_diagram(infra_path)
+    make_lstm_autoencoder_diagram(ae_path)
 
     print(f"Saved {dist_path.relative_to(out_dir.parent)}")
     print(f"Saved {infra_path.relative_to(out_dir.parent)}")
+    print(f"Saved {ae_path.relative_to(out_dir.parent)}")
 
 
 if __name__ == "__main__":
