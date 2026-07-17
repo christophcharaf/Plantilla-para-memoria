@@ -275,10 +275,10 @@ def _draw_stack_box(
 
 def make_lstm_autoencoder_diagram(out_path: Path) -> None:
     """Diagrama codificador--bottleneck--decodificador del LSTM autoencoder."""
-    title_fs = 11.5
-    sub_fs = 10.0
+    title_fs = 13.5
+    sub_fs = 11.5
 
-    fig, ax = plt.subplots(figsize=(11.2, 6.4))
+    fig, ax = plt.subplots(figsize=(11.2, 6.8))
     ax.set_xlim(0, 10)
     ax.set_ylim(0, 6)
     ax.axis("off")
@@ -305,11 +305,11 @@ def make_lstm_autoencoder_diagram(out_path: Path) -> None:
     )
     ax.add_patch(enc_box)
     ax.add_patch(dec_box)
-    ax.text(1.82, 5.35, "Encoder", ha="center", fontsize=13, color="#1d4ed8", fontweight="bold")
-    ax.text(8.18, 5.35, "Decoder", ha="center", fontsize=13, color="#047857", fontweight="bold")
+    ax.text(1.82, 5.35, "Encoder", ha="center", fontsize=14.5, color="#1d4ed8", fontweight="bold")
+    ax.text(8.18, 5.35, "Decoder", ha="center", fontsize=14.5, color="#047857", fontweight="bold")
 
     bw = 2.65
-    bh = 0.52
+    bh = 0.58
     x_enc = 0.5
     enc_layers = [
         ("Entrada", "$(B, 20, 11)$"),
@@ -349,10 +349,10 @@ def make_lstm_autoencoder_diagram(out_path: Path) -> None:
         "$(B, 16)$",
         facecolor="#fef3c7",
         edgecolor="#d97706",
-        title_fontsize=12,
-        subtitle_fontsize=10.5,
+        title_fontsize=13.5,
+        subtitle_fontsize=12,
     )
-    ax.text(4.8, 1.85, "Bottleneck", ha="center", fontsize=11, color="#b45309")
+    ax.text(4.8, 1.85, "Bottleneck", ha="center", fontsize=12.5, color="#b45309")
 
     x_dec = 6.85
     dec_layers = [
@@ -404,7 +404,7 @@ def make_lstm_autoencoder_diagram(out_path: Path) -> None:
         0.15,
         "TimeDistributed en la capa de salida",
         ha="center",
-        fontsize=10,
+        fontsize=11.5,
         color="#64748b",
     )
 

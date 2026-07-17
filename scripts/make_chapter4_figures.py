@@ -220,25 +220,25 @@ def _arrow(
 
 def make_ciclo_vida_alerta(out_path: Path) -> None:
     """Diagrama de estados del ciclo de vida de una alerta (flujo vertical legible en PDF)."""
-    fig, ax = plt.subplots(figsize=(7.8, 9.2))
-    ax.set_xlim(-0.35, 11.4)
-    ax.set_ylim(0, 11)
+    fig, ax = plt.subplots(figsize=(7.2, 7.4))
+    ax.set_xlim(-0.25, 10.8)
+    ax.set_ylim(0.4, 9.2)
     ax.axis("off")
 
-    bw, bh = 2.85, 0.95
+    bw, bh = 2.85, 0.88
     box_fs = 12.5
     arrow_fs = 10.5
     cx = 3.55
 
-    nominal = _draw_state_box(ax, cx, 9.05, bw, bh, "Operación\nnominal", "#dbeafe", "#2563eb", box_fs)
-    potencial = _draw_state_box(ax, cx, 7.35, bw, bh, "Anomalía\npotencial", "#fef3c7", "#d97706", box_fs)
+    nominal = _draw_state_box(ax, cx, 7.55, bw, bh, "Operación\nnominal", "#dbeafe", "#2563eb", box_fs)
+    potencial = _draw_state_box(ax, cx, 6.15, bw, bh, "Anomalía\npotencial", "#fef3c7", "#d97706", box_fs)
     nueva = _draw_state_box(
-        ax, cx, 5.65, bw, bh, "Anomalía nueva\n(alerta de apertura)", "#ffedd5", "#ea580c", box_fs
+        ax, cx, 4.75, bw, bh, "Anomalía nueva\n(alerta de apertura)", "#ffedd5", "#ea580c", box_fs
     )
-    curso = _draw_state_box(ax, cx, 3.95, bw, bh, "Anomalía\nen curso", "#fee2e2", "#dc2626", box_fs)
-    escal = _draw_state_box(ax, 7.05, 3.95, bw, bh, "Escalamiento", "#fecaca", "#b91c1c", box_fs)
+    curso = _draw_state_box(ax, cx, 3.35, bw, bh, "Anomalía\nen curso", "#fee2e2", "#dc2626", box_fs)
+    escal = _draw_state_box(ax, 6.85, 3.35, bw, bh, "Escalamiento", "#fecaca", "#b91c1c", box_fs)
     resol = _draw_state_box(
-        ax, cx, 1.85, bw, bh, "Resolución\n(notificación de cierre)", "#dcfce7", "#16a34a", box_fs
+        ax, cx, 1.55, bw, bh, "Resolución\n(notificación de cierre)", "#dcfce7", "#16a34a", box_fs
     )
 
     def center(box: tuple[float, float, float, float]) -> tuple[float, float]:
@@ -272,8 +272,8 @@ def make_ciclo_vida_alerta(out_path: Path) -> None:
     _arrow(ax, bottom_mid(curso), top_mid(resol), "error < umbral", (0.9, 0), fontsize=arrow_fs)
 
     # Retornos por carriles externos (sin atravesar el flujo central)
-    lane_short = 2.05
-    lane_long = 0.75
+    lane_short = 1.55
+    lane_long = 0.55
 
     _elbow_arrow(
         ax,
@@ -300,9 +300,9 @@ def make_ciclo_vida_alerta(out_path: Path) -> None:
     # Heartbeat: bucle por encima de la flecha de escalamiento (carril derecho)
     cr = right_mid(curso)
     ct = top_mid(curso)
-    lane_r = cr[0] + 0.72
-    loop_y = ct[1] + 0.52
-    y_out = cr[1] + 0.24
+    lane_r = cr[0] + 0.55
+    loop_y = ct[1] + 0.38
+    y_out = cr[1] + 0.18
     ax.plot([cr[0], lane_r], [y_out, y_out], color="#475569", linewidth=1.2, zorder=1, solid_capstyle="round")
     ax.plot([lane_r, lane_r], [y_out, loop_y], color="#475569", linewidth=1.2, zorder=1, solid_capstyle="round")
     ax.add_patch(
@@ -331,8 +331,8 @@ def make_ciclo_vida_alerta(out_path: Path) -> None:
     # Re-alerta: bucle sobre escalamiento (carril propio, sin solapar heartbeat)
     er = right_mid(escal)
     et = top_mid(escal)
-    lane_esc = er[0] + 0.58
-    loop_esc = et[1] + 0.55
+    lane_esc = er[0] + 0.45
+    loop_esc = et[1] + 0.38
     ax.plot([er[0], lane_esc], [er[1] + 0.18, er[1] + 0.18], color="#475569", linewidth=1.2, zorder=1, solid_capstyle="round")
     ax.plot([lane_esc, lane_esc], [er[1] + 0.18, loop_esc], color="#475569", linewidth=1.2, zorder=1, solid_capstyle="round")
     ax.add_patch(
@@ -358,8 +358,8 @@ def make_ciclo_vida_alerta(out_path: Path) -> None:
         zorder=4,
     )
 
-    fig.tight_layout(pad=0.2)
-    fig.savefig(out_path, dpi=300, bbox_inches="tight", facecolor="white")
+    fig.tight_layout(pad=0.05)
+    fig.savefig(out_path, dpi=300, bbox_inches="tight", pad_inches=0.03, facecolor="white")
     plt.close(fig)
 
 

@@ -202,7 +202,7 @@ El bloque detector de la figura anterior agrupa el pipeline de datos, el autoenc
 
 La figura~\ref{fig:flujo-detector} detalla el flujo interno de inferencia: preprocesamiento de la ventana, codificación y decodificación, cálculo del error de reconstrucción y comparación con el umbral calibrado; ante una anomalía confirmada, se emiten alertas hacia Opsgenie y enlaces contextuales a Grafana.
 
-Las etapas \emph{Encoder LSTM} y \emph{Decoder LSTM} implementan el esquema codificador--bottleneck--decodificador de Malhotra et al. en el módulo \texttt{LSTMAutoencoder}, adaptado al vector de once variables y a la ventana de 20 pasos.
+Las etapas \texttt{Encoder LSTM} y \texttt{Decoder LSTM} implementan el esquema codificador--\textit{bottleneck}--decodificador de Malhotra et al. en el módulo \texttt{LSTMAutoencoder}, adaptado al vector de once variables y a la ventana de 20 pasos.
 
 \begin{figure}[H]
 \centering
