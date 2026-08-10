@@ -1,13 +1,13 @@
 \babel@toc {spanish}{}\relax 
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Ejemplo conceptual de una métrica de servicio con un tramo de comportamiento anómalo. Elaboración propia.}}{2}{figure.caption.6}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Ejemplo conceptual de una métrica de servicio con un tramo de comportamiento anómalo.}}{2}{figure.caption.6}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Estructura lógica de ventanas deslizantes.}}{17}{figure.caption.12}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Estructura lógica de ventanas deslizantes.}}{17}{figure.caption.13}%
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Topología de despliegue del sistema de detección.}}{18}{figure.caption.15}%
 \contentsline {figure}{\numberline {3.3}{\ignorespaces Flujo interno del contenedor de detección: desde la consulta a Prometheus hasta la emisión de alertas.}}{19}{figure.caption.16}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Arquitectura del autoencoder LSTM: codificador, \textit {bottleneck} latente y decodificador.}}{20}{figure.caption.17}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}}{23}{figure.caption.22}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Arquitectura del autoencoder LSTM: codificador, \textit {bottleneck} latente y decodificador.}}{19}{figure.caption.17}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}}{22}{figure.caption.21}%
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Evaluación del modelo sobre el conjunto de prueba con anomalías inyectadas: distribución del error, línea de tiempo de detección, matriz de confusión y métricas.}}{33}{figure.caption.29}%
 \contentsline {figure}{\numberline {4.2}{\ignorespaces Señal observada (línea continua) y reconstruida (línea discontinua) para una ventana nominal y una ventana anómala. El eje vertical está en la escala normalizada de entrada al modelo.}}{34}{figure.caption.30}%
@@ -15,5 +15,5 @@
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Panel de Grafana durante la demostración en vivo: pico sostenido de latencia percentil 95 con el resto de métricas nominales.}}{40}{figure.caption.38}%
 \contentsline {figure}{\numberline {4.5}{\ignorespaces Extracto de registros del detector durante la demostración: apertura, deduplicación, escalamiento y resolución.}}{40}{figure.caption.39}%
 \contentsline {figure}{\numberline {4.6}{\ignorespaces Alertas en Jira Service Management Operations durante la demostración en vivo: apertura con contexto de detección y escalamiento por persistencia.}}{41}{figure.caption.40}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Ciclo de vida de una alerta: transiciones entre operación nominal, confirmación, deduplicación, escalamiento y resolución.}}{42}{figure.caption.41}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Ciclo de vida de una alerta: transiciones entre operación nominal, confirmación, deduplicación, escalamiento y resolución.}}{42}{figure.caption.42}%
 \addvspace {10\p@ }

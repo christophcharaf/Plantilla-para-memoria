@@ -23,6 +23,8 @@ El entrenamiento utilizó el historial de 90~días descrito en el capítulo~\ref
 
 Para la evaluación de clasificación se construyó un conjunto de prueba independiente de 24~horas, generado por el mismo núcleo de simulación que el servicio simulado (\path{traffic\_simulation\_core.py}) pero con una semilla distinta de la del entrenamiento, de modo que no compartiera realizaciones concretas de ruido con los datos de ajuste. Sobre ese conjunto se inyectaron tres ventanas de anomalía con instantes y duraciones conocidas, listadas en la tabla~\ref{tab:anomalias-inyectadas}.
 
+Cada ventana deslizante de prueba se etiquetó como anómala cuando contuvo al menos un instante perteneciente a un tramo inyectado. La elección de tres tipos heterogéneos (incremento sostenido, caída abrupta y consumo anómalo de recursos) buscó cubrir formas distintas de degradación: una de cola superior de latencia, una de descenso de demanda y una de presión de recursos. Esa diversidad permitió analizar no solo el desempeño agregado, sino también el comportamiento del detector frente a anomalías de distinta naturaleza.
+
 \begin{table}[H]
 \centering
 \small
@@ -38,8 +40,6 @@ Pico de memoria & 60~min & Memoria residente de 3 a 4~GB y mayor consumo de CPU 
 \bottomrule
 \end{tabular}
 \end{table}
-
-Cada ventana deslizante de prueba se etiquetó como anómala cuando contuvo al menos un instante perteneciente a un tramo inyectado. La elección de tres tipos heterogéneos (incremento sostenido, caída abrupta y consumo anómalo de recursos) buscó cubrir formas distintas de degradación: una de cola superior de latencia, una de descenso de demanda y una de presión de recursos. Esa diversidad permitió analizar no solo el desempeño agregado, sino también el comportamiento del detector frente a anomalías de distinta naturaleza.
 
 \subsection{Confidencialidad de los resultados}
 
@@ -166,9 +166,9 @@ La ventaja del modelo no reside, por tanto, en superar a la línea base sobre an
 
 \subsection{Latencia de detección}
 
-Además de clasificar correctamente las ventanas, resulta relevante evaluar la rapidez con que reacciona el detector una vez iniciada una anomalía. La tabla~\ref{tab:latencia-deteccion} resume, por tipo de anomalía inyectada, la cantidad de ventanas afectadas, las detectadas y el retardo entre la primera ventana afectada y la primera detección, medido en ventanas de inferencia (una cada 30~segundos). Los picos de latencia y de memoria se detectaron en la primera ventana que los contuvo, sin retardo apreciable, porque elevaron el error de reconstrucción de inmediato. La caída de tráfico requirió alrededor de cinco ventanas, equivalentes a unos 2,5~minutos, hasta que el descenso de demanda se acumuló lo suficiente en la ventana para superar el umbral. Ese retardo es coherente con su menor amplitud y con los falsos negativos analizados en la sección~\ref{sec:analisis-errores}.
+Además de clasificar correctamente las ventanas, resulta relevante evaluar la rapidez con que reacciona el detector una vez iniciada una anomalía. La tabla~\ref{tab:latencia-deteccion} resume, por tipo de anomalía inyectada, la cantidad de ventanas afectadas, las detectadas y el retardo entre la primera ventana afectada y la primera detección, medido en ventanas de inferencia (una cada 30~segundos).
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \small
 \caption{Latencia de detección por tipo de anomalía inyectada.}
@@ -183,6 +183,8 @@ Pico de memoria & 139 & 139 & 0 & inmediato \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Los picos de latencia y de memoria se detectaron en la primera ventana que los contuvo, sin retardo apreciable, porque elevaron el error de reconstrucción de inmediato. La caída de tráfico requirió alrededor de cinco ventanas, equivalentes a unos 2,5~minutos, hasta que el descenso de demanda se acumuló lo suficiente en la ventana para superar el umbral. Ese retardo es coherente con su menor amplitud y con los falsos negativos analizados en la sección~\ref{sec:analisis-errores}.
 
 %----------------------------------------------------------------------------------------
 %	SECTION 3
@@ -282,7 +284,7 @@ La figura~\ref{fig:demo-grafana} muestra el panel de Grafana durante el episodio
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{./Figures/demo_grafana.png}
+\includegraphics[width=\textwidth,height=0.32\textheight,keepaspectratio]{./Figures/demo_grafana.png}
 \caption{Panel de Grafana durante la demostración en vivo: pico sostenido de latencia percentil 95 con el resto de métricas nominales.}
 \label{fig:demo-grafana}
 \end{figure}
@@ -291,7 +293,7 @@ La figura~\ref{fig:demo-logs} reproduce el extracto de registros del detector pa
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{./Figures/demo_logs.png}
+\includegraphics[width=\textwidth,height=0.32\textheight,keepaspectratio]{./Figures/demo_logs.png}
 \caption{Extracto de registros del detector durante la demostración: apertura, deduplicación, escalamiento y resolución.}
 \label{fig:demo-logs}
 \end{figure}
@@ -318,16 +320,7 @@ En JSM Operations la alerta de apertura apareció con prioridad P3, el error de 
 
 Un objetivo operativo central, derivado del problema de fatiga de alertas planteado en el capítulo~\ref{Chapter1}, fue evitar la repetición de notificaciones durante un mismo incidente. 
 
-La figura~\ref{fig:ciclo-vida-alerta} resume la máquina de estados implementada; la tabla~\ref{tab:deduplicacion} contrasta ambos comportamientos sobre un episodio sostenido.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.78\textwidth]{./Figures/ciclo_vida_alerta.png}
-\caption{Ciclo de vida de una alerta: transiciones entre operación nominal, confirmación, deduplicación, escalamiento y resolución.}
-\label{fig:ciclo-vida-alerta}
-\end{figure}
-
-Sin deduplicación, una anomalía sostenida generaba una alerta en cada ciclo de 30~segundos. Con el mecanismo de seguimiento por identificador único, confirmación por ciclos y notificación de resolución, cada incidente produjo una única alerta de apertura y una de cierre.
+La tabla~\ref{tab:deduplicacion} contrasta ambos comportamientos sobre un episodio sostenido; la figura~\ref{fig:ciclo-vida-alerta} resume la máquina de estados implementada.
 
 \begin{table}[H]
 \centering
@@ -344,6 +337,15 @@ Confirmación previa & No & 2 ciclos \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Sin deduplicación, una anomalía sostenida generaba una alerta en cada ciclo de 30~segundos. Con el mecanismo de seguimiento por identificador único, confirmación por ciclos y notificación de resolución, cada incidente produjo una única alerta de apertura y una de cierre.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{./Figures/ciclo_vida_alerta.png}
+\caption{Ciclo de vida de una alerta: transiciones entre operación nominal, confirmación, deduplicación, escalamiento y resolución.}
+\label{fig:ciclo-vida-alerta}
+\end{figure}
 
 \subsection{Costo de inferencia y robustez}
 

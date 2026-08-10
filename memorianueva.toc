@@ -24,16 +24,16 @@
 \contentsline {subsection}{\numberline {3.2.1}Encoder-Decoder LSTM}{19}{subsection.3.2.1}%
 \contentsline {subsection}{\numberline {3.2.2}Función de pérdida y señal de anomalía}{20}{subsection.3.2.2}%
 \contentsline {subsection}{\numberline {3.2.3}Acoplamiento multivariado y espacio latente}{21}{subsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.2.4}Decisiones de diseño arquitectónico}{22}{subsection.3.2.4}%
-\contentsline {section}{\numberline {3.3}Entrenamiento, evaluación y optimización}{22}{section.3.3}%
+\contentsline {subsection}{\numberline {3.2.4}Decisiones de diseño arquitectónico}{21}{subsection.3.2.4}%
+\contentsline {section}{\numberline {3.3}Entrenamiento, evaluación y optimización}{21}{section.3.3}%
 \contentsline {subsection}{\numberline {3.3.1}Características del dataset}{22}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Procedimiento de entrenamiento}{24}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.2}Procedimiento de entrenamiento}{23}{subsection.3.3.2}%
 \contentsline {subsection}{\numberline {3.3.3}Calibración del umbral}{25}{subsection.3.3.3}%
 \contentsline {subsection}{\numberline {3.3.4}Exploración de hiperparámetros}{25}{subsection.3.3.4}%
 \contentsline {section}{\numberline {3.4}Integración e implementación del sistema}{26}{section.3.4}%
 \contentsline {subsection}{\numberline {3.4.1}Servicio de inferencia}{26}{subsection.3.4.1}%
 \contentsline {subsection}{\numberline {3.4.2}Gestión de alertas y deduplicación}{27}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Enlaces contextuales a Grafana}{28}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.3}Enlaces contextuales a Grafana}{27}{subsection.3.4.3}%
 \contentsline {subsection}{\numberline {3.4.4}Despliegue y configuración}{28}{subsection.3.4.4}%
 \contentsline {subsection}{\numberline {3.4.5}Registro, trazabilidad y requisitos no funcionales}{29}{subsection.3.4.5}%
 \contentsline {subsection}{\numberline {3.4.6}Flujo operativo en producción}{29}{subsection.3.4.6}%
@@ -42,12 +42,12 @@
 \contentsline {subsection}{\numberline {4.1.1}Conjuntos de datos y partición}{31}{subsection.4.1.1}%
 \contentsline {subsection}{\numberline {4.1.2}Confidencialidad de los resultados}{32}{subsection.4.1.2}%
 \contentsline {subsection}{\numberline {4.1.3}Métricas y condiciones de prueba}{32}{subsection.4.1.3}%
-\contentsline {section}{\numberline {4.2}Evaluación del modelo}{33}{section.4.2}%
+\contentsline {section}{\numberline {4.2}Evaluación del modelo}{32}{section.4.2}%
 \contentsline {subsection}{\numberline {4.2.1}Calidad de reconstrucción}{33}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Reconstrucción de ventanas nominales y anómalas}{34}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.2}Reconstrucción de ventanas nominales y anómalas}{33}{subsection.4.2.2}%
 \contentsline {subsection}{\numberline {4.2.3}Desempeño de clasificación}{34}{subsection.4.2.3}%
 \contentsline {subsection}{\numberline {4.2.4}Sensibilidad al umbral}{35}{subsection.4.2.4}%
-\contentsline {subsection}{\numberline {4.2.5}Comparación con una línea base de umbrales fijos}{36}{subsection.4.2.5}%
+\contentsline {subsection}{\numberline {4.2.5}Comparación con una línea base de umbrales fijos}{35}{subsection.4.2.5}%
 \contentsline {subsection}{\numberline {4.2.6}Latencia de detección}{36}{subsection.4.2.6}%
 \contentsline {section}{\numberline {4.3}Análisis de errores}{36}{section.4.3}%
 \contentsline {subsection}{\numberline {4.3.1}Falsos negativos}{37}{subsection.4.3.1}%
@@ -55,13 +55,13 @@
 \contentsline {subsection}{\numberline {4.3.3}Contribución de cada variable al error}{37}{subsection.4.3.3}%
 \contentsline {subsection}{\numberline {4.3.4}Errores observados en el despliegue real}{38}{subsection.4.3.4}%
 \contentsline {section}{\numberline {4.4}Ensayos de integración del sistema}{38}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}Detección extremo a extremo}{39}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.1}Detección extremo a extremo}{38}{subsection.4.4.1}%
 \contentsline {subsection}{\numberline {4.4.2}Canal de alertas intercambiable}{39}{subsection.4.4.2}%
 \contentsline {subsection}{\numberline {4.4.3}Demostración en el entorno demostrativo}{39}{subsection.4.4.3}%
 \contentsline {subsection}{\numberline {4.4.4}Deduplicación de alertas}{41}{subsection.4.4.4}%
 \contentsline {subsection}{\numberline {4.4.5}Costo de inferencia y robustez}{42}{subsection.4.4.5}%
-\contentsline {chapter}{\numberline {5}Conclusiones}{45}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Logros alcanzados}{45}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Conocimientos aplicados}{46}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Trabajo futuro}{46}{section.5.3}%
-\contentsline {chapter}{Bibliografía}{49}{appendix*.44}%
+\contentsline {chapter}{\numberline {5}Conclusiones}{43}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Logros alcanzados}{43}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Conocimientos aplicados}{44}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Trabajo futuro}{44}{section.5.3}%
+\contentsline {chapter}{Bibliografía}{47}{appendix*.44}%

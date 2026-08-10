@@ -74,9 +74,9 @@ Tras la alineación, el módulo \texttt{DataPreprocessor} enriqueció cada insta
 
 La codificación cíclica evita discontinuidades artificiales en los límites del calendario (por ejemplo, entre las 23:00 y las 00:00) y permite al modelo distinguir patrones diarios y semanales sin depender de umbrales fijos por horario.
 
-La normalización se realizó con \texttt{MinMaxScaler} en modo \texttt{fixed\_minmax}: en lugar de ajustar mínimos y máximos sobre el conjunto de entrenamiento, se fijaron cotas determinísticas por variable en \path{config/data.yaml}, derivadas del análisis del servicio simulado y validadas contra consultas reales. La tabla~\ref{tab:fixed-bounds} resume los rangos adoptados.
+La normalización se realizó con MinMaxScaler en modo \texttt{fixed\_minmax}: en lugar de ajustar mínimos y máximos sobre el conjunto de entrenamiento, se fijaron cotas determinísticas por variable en \path{config/data.yaml}, derivadas del análisis del servicio simulado y validadas contra consultas reales. La tabla~\ref{tab:fixed-bounds} resume los rangos adoptados.
 
-En las primeras iteraciones se probó \texttt{StandardScaler}, que memoriza media y desviación estándar del lote de entrenamiento. Cuando el modelo entrenado con datos sintéticos se evaluó sobre Prometheus productivo, las series normalizadas quedaron desplazadas respecto del dominio aprendido y el error de reconstrucción superó el umbral de forma sistemática en tramos nominales.
+En las primeras iteraciones se probó StandardScaler, que memoriza media y desviación estándar del lote de entrenamiento. Cuando el modelo entrenado con datos sintéticos se evaluó sobre Prometheus productivo, las series normalizadas quedaron desplazadas respecto del dominio aprendido y el error de reconstrucción superó el umbral de forma sistemática en tramos nominales.
 
 El modo \texttt{fixed\_minmax} eliminó ese acoplamiento: la misma observación cruda produce siempre la misma coordenada normalizada, con independencia del origen o del período de entrenamiento. Este criterio resultó central para desplegar un único par modelo--preprocesador en producción sin recalibrar el escalador ante cada reentrenamiento.
 
@@ -102,7 +102,7 @@ Indicadores binarios & 0 & 1 \\
 \end{tabular}
 \end{table}
 
-La tasa de peticiones sigue un factor diario sinusoidal con ruido gaussiano, la latencia percentil 95 se modela como proporcional a ese factor más un piso constante, y las tasas de error y CPU escalan con la demanda esperada. Los límites superiores incorporaron margen por encima del máximo observado en condiciones nominales para absorber picos breves sin saturar la escala. Si una observación excediera una cota, \texttt{MinMaxScaler} la acotó al intervalo $[0,1]$, señal explícita de régimen extremo que el autoencoder aprendió a reconstruir con mayor error.
+La tasa de peticiones sigue un factor diario sinusoidal con ruido gaussiano, la latencia percentil 95 se modela como proporcional a ese factor más un piso constante, y las tasas de error y CPU escalan con la demanda esperada. Los límites superiores incorporaron margen por encima del máximo observado en condiciones nominales para absorber picos breves sin saturar la escala. Si una observación excediera una cota, MinMaxScaler la acotó al intervalo $[0,1]$, señal explícita de régimen extremo que el autoencoder aprendió a reconstruir con mayor error.
 
 
 El preprocesador serializado (\path{models/preprocessor.joblib}) persiste el escalador, la lista de columnas activas y la configuración de variables temporales, de modo que inferencia y entrenamiento aplican la misma transformación bit a bit.
@@ -120,18 +120,9 @@ Cada ventana abarcó 10~minutos de operación ($20 \times 30\,\mathrm{s}$), hori
 
 La longitud de 20 pasos implicó que una anomalía puntual de un solo muestreo quedara diluida en la reconstrucción global de la ventana, mientras que desvíos sostenidos durante varios minutos, el caso operativo de interés, modificaron de forma coherente múltiples pasos y varias variables a la vez y elevaron el error agregado por encima del umbral. Ventanas más cortas (10 pasos) reaccionaron antes pero fueron más sensibles al ruido. Ventanas de 30 pasos (15~minutos) suavizaron en exceso incidentes breves. El valor 20 resultó del benchmark interno documentado en \path{tune\_model.py}.
 
-La tabla~\ref{tab:pipeline-etapas} detalla entradas, salidas y artefactos de cada etapa, la figura \ref{fig:sliding_window} demuestra gráficamente la ventana deslizante.
+La tabla~\ref{tab:pipeline-etapas} detalla entradas, salidas y artefactos de cada etapa; la figura~\ref{fig:sliding_window} ilustra la ventana deslizante.
 
-
-
-\begin{figure}
-\centering
-\includegraphics[width=0.92\textwidth]{./Figures/sliding_window.png}
-\caption{Estructura lógica de ventanas deslizantes.}
-\label{fig:sliding_window}
-\end{figure}
-
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \small
 \caption{Etapas del pipeline de datos y artefactos producidos.}
@@ -143,12 +134,19 @@ La tabla~\ref{tab:pipeline-etapas} detalla entradas, salidas y artefactos de cad
 Recolección & Consultas PromQL $\rightarrow$ series por métrica & \texttt{PrometheusClient}, \path{config/data.yaml} \\
 Alineación & Series $\rightarrow$ marco temporal unificado & \texttt{pandas}, forward-fill acotado \\
 Ingeniería & Marco + reloj $\rightarrow$ 11 variables & \texttt{add\_temporal\_features} de \texttt{preprocessor} \\
-Normalización & Crudos $\rightarrow$ $[0,1]$ fijo & \texttt{MinMaxScaler}, cotas YAML \\
+Normalización & Crudos $\rightarrow$ $[0,1]$ fijo & MinMaxScaler, cotas YAML \\
 Ventanas & Serie $\rightarrow$ $(N, 20, 11)$ & \texttt{WindowGenerator} \\
 Persistencia & Escalador y metadatos & \path{preprocessor.joblib} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\textwidth]{./Figures/sliding_window.png}
+\caption{Estructura lógica de ventanas deslizantes.}
+\label{fig:sliding_window}
+\end{figure}
 
 \subsection{Organización del código fuente}
 
@@ -193,20 +191,18 @@ El sistema se organizó en capas acopladas al monitoreo existente. Un servicio s
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\linewidth]{./Figures/infra_demo.png}
+\includegraphics[width=\linewidth]{./Figures/infra_demo.png}
 \caption{Topología de despliegue del sistema de detección.}
 \label{fig:infra_demo.png}
 \end{figure}
 
-El bloque detector de la figura anterior agrupa el pipeline de datos, el autoencoder LSTM y la lógica de umbral descritos en las secciones anteriores. 
+El bloque detector de la figura anterior agrupa el pipeline de datos, el autoencoder LSTM y la lógica de umbral descritos en las secciones anteriores.
 
 La figura~\ref{fig:flujo-detector} detalla el flujo interno de inferencia: preprocesamiento de la ventana, codificación y decodificación, cálculo del error de reconstrucción y comparación con el umbral calibrado; ante una anomalía confirmada, se emiten alertas hacia Opsgenie y enlaces contextuales a Grafana.
 
-Las etapas \texttt{Encoder LSTM} y \texttt{Decoder LSTM} implementan el esquema codificador--\textit{bottleneck}--decodificador de Malhotra et al. en el módulo \texttt{LSTMAutoencoder}, adaptado al vector de once variables y a la ventana de 20 pasos.
-
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.92\linewidth]{./Figures/flow_diag.png}
+\includegraphics[width=0.89\textwidth,height=0.35\textheight,keepaspectratio]{./Figures/flow_diag.png}
 \caption{Flujo interno del contenedor de detección: desde la consulta a Prometheus hasta la emisión de alertas.}
 \label{fig:flujo-detector}
 \end{figure}
@@ -215,20 +211,20 @@ Las etapas \texttt{Encoder LSTM} y \texttt{Decoder LSTM} implementan el esquema 
 
 
 
-El codificador apiló tres capas \texttt{LSTM} con 64, 32 y 16 unidades respectivamente. Las dos primeras devolvieron secuencias completas (\texttt{return\_sequences=True}), y la tercera produjo el vector latente de dimensión 16. Entre capas recurrentes se insertó \textit{dropout} del 10~\% para regularizar.
+El codificador apiló tres capas LSTM con 64, 32 y 16 unidades respectivamente. Las dos primeras devolvieron secuencias completas (\texttt{return\_sequences=True}), y la tercera produjo el vector latente de dimensión 16. Entre capas recurrentes se insertó \textit{dropout} del 10~\% para regularizar.
 
-El decodificador expandió el latente mediante \texttt{RepeatVector}, replicándolo a lo largo de los 20 pasos temporales, y aplicó tres capas \texttt{LSTM} simétricas (16, 32 y 64 unidades) con dropout del 10~\%. La salida se obtuvo con una capa \texttt{TimeDistributed}\allowbreak\texttt{(Dense(11))} que reconstruyó las once variables en cada instante. La figura~\ref{fig:lstm-autoencoder-arch} resume la pila de capas y las formas tensoriales intermedias.
+El decodificador expandió el latente mediante RepeatVector, replicándolo a lo largo de los 20 pasos temporales, y aplicó tres capas LSTM simétricas (16, 32 y 64 unidades) con dropout del 10~\%. La salida se obtuvo con una capa \texttt{TimeDistributed}\allowbreak\texttt{(Dense(11))} que reconstruyó las once variables en cada instante. La figura~\ref{fig:lstm-autoencoder-arch} resume la pila de capas y las formas tensoriales intermedias.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{./Figures/lstm_autoencoder_arch.png}
+\includegraphics[width=0.92\textwidth,height=0.38\textheight,keepaspectratio]{./Figures/lstm_autoencoder_arch.png}
 \caption{Arquitectura del autoencoder LSTM: codificador, \textit{bottleneck} latente y decodificador.}
 \label{fig:lstm-autoencoder-arch}
 \end{figure}
 
 La tabla~\ref{tab:capas-modelo} complementa el diagrama con el rol de cada capa.
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \small
 \caption{Capas del autoencoder LSTM y formas intermedias ($B$ = tamaño de lote).}
@@ -329,6 +325,9 @@ La evaluación del sistema se concibió en función de indicadores operativos ve
 Cada observación temporal del conjunto consta de cinco métricas técnicas del servicio, seleccionadas para cubrir carga, experiencia del usuario y salud del proceso:
 
 \begin{enumerate}
+  \setlength{\itemsep}{0pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
 \item \texttt{request\_rate}: tasa de peticiones HTTP por segundo.
 \item \texttt{latency\_p95}: percentil 95 de la latencia de respuesta.
 \item \texttt{memory\_usage}: memoria residente del proceso.
@@ -336,11 +335,20 @@ Cada observación temporal del conjunto consta de cinco métricas técnicas del 
 \item \texttt{cpu\_usage}: fracción de CPU consumida.
 \end{enumerate}
 
-Sobre estas métricas se derivaron seis variables temporales adicionales mediante codificación cíclica de la hora y del día de la semana, junto con indicadores de fin de semana y horario nocturno. La tabla~\ref{tab:dataset} sintetiza las características del conjunto antes y después de la transformación a ventanas deslizantes de 20 pasos (10~minutos).
+Sobre estas métricas se derivaron seis variables temporales adicionales mediante codificación cíclica de la hora y del día de la semana, junto con indicadores de fin de semana y horario nocturno. La figura~\ref{fig:dataset-dist} muestra la distribución marginal de las cinco métricas técnicas sobre datos sintéticos ilustrativos con estacionalidad diaria compatible con el \textit{mock service}. Se incluye únicamente con fines demostrativos, dado que no corresponde publicar histogramas de la telemetría real.
 
-\begin{table}
+\begin{figure}[H]
 \centering
-\small
+\includegraphics[width=0.88\textwidth]{./Figures/dataset_distribution.png}
+\caption{Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}
+\label{fig:dataset-dist}
+\end{figure}
+
+La tabla~\ref{tab:dataset} sintetiza las características del conjunto antes y después de la transformación a ventanas deslizantes de 20 pasos (10~minutos).
+
+\begin{table}[H]
+\centering
+\footnotesize
 \caption{Descripción del conjunto de datos utilizado para entrenamiento y evaluación.}
 \label{tab:dataset}
 \begin{tabular}{@{}p{0.34\textwidth}p{0.58\textwidth}@{}}
@@ -362,16 +370,8 @@ Etiquetas & Régimen no supervisado: entrenamiento sobre tramos nominales. \\
 \end{tabular}
 \end{table}
 
-La figura~\ref{fig:dataset-dist} muestra la distribución marginal de las cinco métricas técnicas sobre datos sintéticos ilustrativos con estacionalidad diaria compatible con el \textit{mock service}. Se incluye únicamente con fines demostrativos, dado que no corresponde publicar histogramas de la telemetría real.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.92\textwidth]{./Figures/dataset_distribution.png}
-\caption{Distribución de las métricas técnicas del servicio (datos sintéticos ilustrativos).}
-\label{fig:dataset-dist}
-\end{figure}
-
 Cabe aclarar que el problema se planteó como detección no supervisada: el conjunto de entrenamiento se compuso de tramos en los que el servicio operó dentro de su régimen nominal y no se dispuso de un etiquetado fiable de anomalías históricas a la escala del dataset completo.
+
 \subsection{Procedimiento de entrenamiento}
 
 El script \path{scripts/train.py} orquestó el flujo completo: carga de configuración, obtención de datos, preprocesamiento, generación de ventanas, entrenamiento, persistencia de artefactos y cálculo del umbral. Los hiperparámetros principales se fijaron en \path{config/model.yaml} y se resumen en la tabla~\ref{tab:hiperparametros}.
@@ -542,7 +542,7 @@ El operador que recibió la alerta en Opsgenie accedió con un clic a la misma v
 
 En el perfil \texttt{dev} de Docker Compose, el detector comparte red puente con un servicio simulado, Prometheus y Grafana. En producción, el contenedor de detección se integró a la red interna existente, consultó directamente la instancia Prometheus corporativa y emitió alertas hacia Opsgenie, sin exponer puertos hacia internet ni depender de servicios analíticos externos.
 
-El contenedor se construyó con un \path{Dockerfile} multi-etapa mínimo: instalación de dependencias Python desde \path{requirements.txt}, copia del código fuente y arranque de \path{inference.py} con usuario sin privilegios. Los directorios \path{models/}, \path{config/} y \path{logs/} se montaron como volúmenes para permitir actualizar pesos y umbrales sin reconstruir la imagen. Los límites de recursos (1 CPU virtual y 2~GB de RAM) resultaron suficientes para el ciclo de 30~segundos en las pruebas de despliegue realizadas.
+El contenedor se construyó con un Dockerfile multi-etapa mínimo: instalación de dependencias Python desde requirements.txt, copia del código fuente y arranque de \path{inference.py} con usuario sin privilegios. Los directorios \path{models/}, \path{config/} y \path{logs/} se montaron como volúmenes para permitir actualizar pesos y umbrales sin reconstruir la imagen. Los límites de recursos (1 CPU virtual y 2~GB de RAM) resultaron suficientes para el ciclo de 30~segundos en las pruebas de despliegue realizadas.
 
 La tabla~\ref{tab:config-yaml} resume los archivos de configuración que parametrizan el sistema sin recompilar la imagen.
 
